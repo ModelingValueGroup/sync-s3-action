@@ -58,6 +58,7 @@ jobs:
                  INPUT_CMD=nop
           . ./entrypoint.sh
 
+          s3cmd_ rm "s3://mvg-test-bucket/s3-dir/test123"
           s3cmd_ rm "s3://mvg-test-bucket/s3-dir"
           s3cmd_ rb "s3://mvg-test-bucket"
 
