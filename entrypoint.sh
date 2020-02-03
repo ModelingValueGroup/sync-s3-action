@@ -38,7 +38,7 @@ if [[ "$INPUT_HOST" == "" ]];then
     if [[ "$INPUT_REGION" == "" ]]; then
         INPUT_REGION="nl-ams"
     fi
-    INPUT_HOST="https://s3.$INPUT_REGION.scw.cloud"
+    INPUT_HOST="s3.$INPUT_REGION.scw.cloud"
 fi
 if [[ "$INPUT_CMD" != "put" && "$INPUT_CMD" != "get" ]]; then
     echo "::error::CMD must be 'put' or 'get' (not '$INPUT_CMD')"
