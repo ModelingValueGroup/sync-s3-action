@@ -1,0 +1,39 @@
+name: 'sync-s3-action'
+description: 'get/put files from/to S3'
+author: 'Tom Brus'
+
+inputs:
+  host:
+    description: 'the s3 host (defaults to Scaleway: https://s3.$region.scw.cloud)'
+    required: false
+  region:
+    description: 'the s3 region'
+    required: false
+    default: "nl-ams"
+  bucket:
+    description: 'the s3 bucket'
+    required: true
+  access_key:
+    description: 'the AWS or Scaleway ACCESS_KEY'
+    required: true
+  secret_key:
+    description: 'the AWS or Scaleway SECRET_KEY'
+    required: true
+  cmd:
+    description: 'the direction of the copy: "put" or "get"'
+    required: false
+    default: "get"
+  local_dir:
+    description: 'the local dir to copy from/to'
+    required: true
+  s3_dir:
+    description: 'the s3 remote dir to copy to/from'
+    required: true
+  trace:
+    description: 'set this to "true" if you would like bash-tracing'
+    required: false
+    default: "false"
+
+runs:
+  using: 'node12'
+  main : 'entrypoint.js'

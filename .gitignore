@@ -1,0 +1,9 @@
+.DS_Store
+.env
+/buildTools.jar
+/header
+/.idea/**/workspace.xml
+/.idea/**/tasks.xml
+/.idea/**/dictionaries
+/.idea/**/shelf
+/.idea/**/xtextAutoBuilderState.xml
