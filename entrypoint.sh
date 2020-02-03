@@ -45,10 +45,10 @@ if [[ "$INPUT_CMD" != "put" && "$INPUT_CMD" != "get" ]]; then
     exit 99
 fi
 
-echo "# going to $INPUT_CMD on/from $INPUT_HOST"
+echo "# going to $INPUT_CMD on $INPUT_HOST"
 
 s3cmd_(){
-    s3cmd                                           \
+    s3cmd -d -v                                          \
                    --host="https://$INPUT_HOST"     \
             --host-bucket=                          \
              --access_key="$INPUT_ACCESS_KEY"       \
@@ -56,16 +56,22 @@ s3cmd_(){
         "$@"
 }
 
-if ! s3cmd_ -q ls "s3://$INPUT_BUCKET"; then
-    echo "# creating bucket: $INPUT_BUCKET"
-    s3cmd_  mb "s3://$INPUT_BUCKET"
-fi
 case "$INPUT_CMD" in
 (put)
+    if ! s3cmd_ -q ls "s3://$INPUT_BUCKET"; then
+        echo "# creating bucket: $INPUT_BUCKET"
+        s3cmd_  mb "s3://$INPUT_BUCKET"
+    fi
     s3cmd_ --recursive put "$INPUT_LOCAL_DIR/" "s3://$INPUT_BUCKET/$INPUT_S3_DIR/"
     ;;
 (get)
     mkdir -p "$INPUT_LOCAL_DIR"
+    if ! s3cmd_ -q ls "s3://$INPUT_BUCKET"; then
+        echo "# creating bucket: $INPUT_BUCKET"
+        s3cmd_  mb "s3://$INPUT_BUCKET"
+    fi
     s3cmd_ --recursive get "s3://$INPUT_BUCKET/$INPUT_S3_DIR/" "$INPUT_LOCAL_DIR/"
+    ;;
+(nop)
     ;;
 esac

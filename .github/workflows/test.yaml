@@ -8,33 +8,63 @@ jobs:
       - name: "checkout"
         uses: actions/checkout@v1
 
-      - name: "test"
+      - name: "install s3cmd"
         run: |
-          set -x
+          sudo apt-get update
+          sudo apt-get install -y s3cmd
+
+      - name: "test-prepare"
+        run: |
           mkdir test-dir
           echo test123 >test-dir/test123
+          dig s3.nl-ams.scw.cloud
 
+      - name: "test-put"
+        run: |
+          set -x
                 INPUT_HOST=
               INPUT_REGION=
               INPUT_BUCKET="test-bucket"
           INPUT_ACCESS_KEY="${{ secrets.SCALEWAY_ACCESS_KEY }}"
           INPUT_SECRET_KEY="${{ secrets.SCALEWAY_SECRET_KEY }}"
               INPUT_S3_DIR=s3-dir
-
-          INPUT_LOCAL_DIR=test-dir
-          INPUT_CMD=put
+           INPUT_LOCAL_DIR=test-dir
+                 INPUT_CMD=put
           . ./entrypoint.sh
 
-          INPUT_LOCAL_DIR=test-dir-2
-          INPUT_CMD=get
+      - name: "test-put"
+        run: |
+          set -x
+                INPUT_HOST=
+              INPUT_REGION=
+              INPUT_BUCKET="test-bucket"
+          INPUT_ACCESS_KEY="${{ secrets.SCALEWAY_ACCESS_KEY }}"
+          INPUT_SECRET_KEY="${{ secrets.SCALEWAY_SECRET_KEY }}"
+              INPUT_S3_DIR=s3-dir
+           INPUT_LOCAL_DIR=test-dir-2
+                 INPUT_CMD=get
+          . ./entrypoint.sh
+
+      - name: "test-cleanup"
+        run: |
+          set -x
+                INPUT_HOST=
+              INPUT_REGION=
+              INPUT_BUCKET="test-bucket"
+          INPUT_ACCESS_KEY="${{ secrets.SCALEWAY_ACCESS_KEY }}"
+          INPUT_SECRET_KEY="${{ secrets.SCALEWAY_SECRET_KEY }}"
+              INPUT_S3_DIR=s3-dir
+           INPUT_LOCAL_DIR=test-dir-2
+                 INPUT_CMD=nop
           . ./entrypoint.sh
 
           s3cmd_ rm "s3://test-bucket/s3-dir"
           s3cmd_ rb "s3://test-bucket"
 
+      - name: "check"
+          run: |
           if [[ "$(cat test-dir/test123)" != "$(cat test-dir-2/test123)" ]]; then
             echo "::error::failed to get the test file"
             exit 88
           fi
-
           echo "# all ok"
