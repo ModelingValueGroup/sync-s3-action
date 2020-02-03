@@ -21,7 +21,6 @@ jobs:
 
       - name: "test-put"
         run: |
-          set -x
                 INPUT_HOST=
               INPUT_REGION=
               INPUT_BUCKET="mvg-test-bucket"
@@ -34,7 +33,6 @@ jobs:
 
       - name: "test-put"
         run: |
-          set -x
                 INPUT_HOST=
               INPUT_REGION=
               INPUT_BUCKET="mvg-test-bucket"
@@ -47,7 +45,6 @@ jobs:
 
       - name: "test-cleanup"
         run: |
-          set -x
                 INPUT_HOST=
               INPUT_REGION=
               INPUT_BUCKET="mvg-test-bucket"
