@@ -48,7 +48,7 @@ fi
 echo "# going to $INPUT_CMD on $INPUT_HOST"
 
 s3cmd_(){
-    s3cmd -d -v                                          \
+    s3cmd                                           \
                    --host="https://$INPUT_HOST"     \
             --host-bucket=                          \
              --access_key="$INPUT_ACCESS_KEY"       \
