@@ -24,7 +24,7 @@ jobs:
           set -x
                 INPUT_HOST=
               INPUT_REGION=
-              INPUT_BUCKET="test-bucket"
+              INPUT_BUCKET="mvg-test-bucket"
           INPUT_ACCESS_KEY="${{ secrets.SCALEWAY_ACCESS_KEY }}"
           INPUT_SECRET_KEY="${{ secrets.SCALEWAY_SECRET_KEY }}"
               INPUT_S3_DIR=s3-dir
@@ -37,7 +37,7 @@ jobs:
           set -x
                 INPUT_HOST=
               INPUT_REGION=
-              INPUT_BUCKET="test-bucket"
+              INPUT_BUCKET="mvg-test-bucket"
           INPUT_ACCESS_KEY="${{ secrets.SCALEWAY_ACCESS_KEY }}"
           INPUT_SECRET_KEY="${{ secrets.SCALEWAY_SECRET_KEY }}"
               INPUT_S3_DIR=s3-dir
@@ -50,7 +50,7 @@ jobs:
           set -x
                 INPUT_HOST=
               INPUT_REGION=
-              INPUT_BUCKET="test-bucket"
+              INPUT_BUCKET="mvg-test-bucket"
           INPUT_ACCESS_KEY="${{ secrets.SCALEWAY_ACCESS_KEY }}"
           INPUT_SECRET_KEY="${{ secrets.SCALEWAY_SECRET_KEY }}"
               INPUT_S3_DIR=s3-dir
@@ -58,8 +58,8 @@ jobs:
                  INPUT_CMD=nop
           . ./entrypoint.sh
 
-          s3cmd_ rm "s3://test-bucket/s3-dir"
-          s3cmd_ rb "s3://test-bucket"
+          s3cmd_ rm "s3://mvg-test-bucket/s3-dir"
+          s3cmd_ rb "s3://mvg-test-bucket"
 
       - name: "check"
         run: |
