@@ -16,7 +16,7 @@
 
 set -euo pipefail
 
-if [[ "$INPUT_TRACE" == "true" ]]; then
+if [[ "${INPUT_TRACE:-false}" == "true" ]]; then
     set -x
 fi
 

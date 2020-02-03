@@ -2,14 +2,11 @@ name: test
 on:
   push
 jobs:
-  build:
+  test:
     runs-on: [ubuntu-latest]
     steps:
       - name: "checkout"
         uses: actions/checkout@v1
-
-      - name: "attach head"
-        run: git checkout "${GITHUB_REF#refs/heads/}"
 
       - name: "test"
         run: |
