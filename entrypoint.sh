@@ -40,7 +40,7 @@ if [[ "$INPUT_HOST" == "" ]];then
     fi
     INPUT_HOST="s3.$INPUT_REGION.scw.cloud"
 fi
-if [[ "$INPUT_CMD" != "put" && "$INPUT_CMD" != "get" ]]; then
+if [[ "$INPUT_CMD" != "put" && "$INPUT_CMD" != "get" && "$INPUT_CMD" != "nop" ]]; then
     echo "::error::CMD must be 'put' or 'get' (not '$INPUT_CMD')"
     exit 99
 fi
