@@ -62,7 +62,7 @@ jobs:
           s3cmd_ rb "s3://test-bucket"
 
       - name: "check"
-          run: |
+        run: |
           if [[ "$(cat test-dir/test123)" != "$(cat test-dir-2/test123)" ]]; then
             echo "::error::failed to get the test file"
             exit 88
