@@ -23,7 +23,7 @@ jobs:
         with:
           access_key: "${{ secrets.SCALEWAY_ACCESS_KEY }}"
           secret_key: "${{ secrets.SCALEWAY_SECRET_KEY }}"
-          bucket    : mvg-test-bucket-temp
+          bucket    : mvg-test-temp
           cmd       : put
           local_dir : "test-dir-put"
           s3_dir    : "s3-dir"
@@ -33,7 +33,7 @@ jobs:
         with:
           access_key: "${{ secrets.SCALEWAY_ACCESS_KEY }}"
           secret_key: "${{ secrets.SCALEWAY_SECRET_KEY }}"
-          bucket    : mvg-test-bucket-temp
+          bucket    : mvg-test-temp
           cmd       : get
           local_dir : "test-dir-get"
           s3_dir    : "s3-dir"
@@ -45,9 +45,9 @@ jobs:
           INPUT_SECRET_KEY="${{ secrets.SCALEWAY_SECRET_KEY }}"
           . ./functions.sh
           handleArgs
-          s3cmd_ rm "s3://mvg-test-bucket-temp/s3-dir/test123"
-          s3cmd_ rm "s3://mvg-test-bucket-temp/s3-dir"
-          s3cmd_ rb "s3://mvg-test-bucket-temp"
+          s3cmd_ rm "s3://mvg-test-temp/s3-dir/test123"
+          s3cmd_ rm "s3://mvg-test-temp/s3-dir"
+          s3cmd_ rb "s3://mvg-test-temp"
 
       - name: "test-check"
         run: |
@@ -63,7 +63,7 @@ jobs:
         with:
           access_key: "${{ secrets.SCALEWAY_ACCESS_KEY }}"
           secret_key: "${{ secrets.SCALEWAY_SECRET_KEY }}"
-          bucket    : mvg-test-bucket-perm
+          bucket    : mvg-test-perm
           cmd       : put
           local_dir : "."
           s3_dir    : "ModelingValueGroup/sync-s3-action/${{ github.ref }}"
@@ -74,7 +74,7 @@ jobs:
         with:
           access_key: "${{ secrets.SCALEWAY_ACCESS_KEY }}"
           secret_key: "${{ secrets.SCALEWAY_SECRET_KEY }}"
-          bucket    : mvg-test-bucket-perm
+          bucket    : mvg-test-perm
           cmd       : put
           local_dir : "."
           s3_dir    : "ModelingValueGroup/sync-s3-action"
