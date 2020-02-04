@@ -14,6 +14,59 @@
 ##     Arjan Kok, Carel Bast                                                                                           ~
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-. ./functions.sh
+set -euo pipefail
 
-main
+setupTracing() {
+    if [[ "${INPUT_TRACE:-false}" == "true" ]]; then
+        for name in TRACE HOST REGION BUCKET ACCESS_KEY SECRET_KEY CMD LOCAL_DIR S3_DIR; do
+            printf "# %12s = %s\n" "$name" "$(eval "echo \${INPUT_$name:-}")"
+        done
+        set -x
+    fi
+}
+installS3cmd() {
+    if ! command -v s3cmd >/dev/null; then
+        sudo apt-get update
+        sudo apt-get install -y s3cmd
+    fi
+}
+handleArgs() {
+    if [[ "$INPUT_HOST" == "" ]];then
+        INPUT_REGION="${INPUT_REGION:-nl-ams}"
+        INPUT_HOST="s3.$INPUT_REGION.scw.cloud"
+    fi
+}
+s3cmd_() {
+    s3cmd                                   \
+               --host="https://$INPUT_HOST" \
+         --access_key="$INPUT_ACCESS_KEY"   \
+         --secret_key="$INPUT_SECRET_KEY"   \
+        --host-bucket=                      \
+        "$@"
+}
+get() {
+    mkdir -p "$INPUT_LOCAL_DIR"
+    s3cmd_ --recursive get "s3://$INPUT_BUCKET/$INPUT_S3_DIR/" "$INPUT_LOCAL_DIR/"
+}
+put() {
+    if ! s3cmd_ ls "s3://$INPUT_BUCKET" 2>/dev/null 1>&2; then
+        echo "# bucket not found, creating bucket: $INPUT_BUCKET"
+        s3cmd_ mb "s3://$INPUT_BUCKET"
+    fi
+    s3cmd_ --recursive put "$INPUT_LOCAL_DIR/" "s3://$INPUT_BUCKET/$INPUT_S3_DIR/"
+}
+main() {
+    setupTracing
+    installS3cmd
+    handleArgs
+
+    echo "# going to '$INPUT_CMD' on '$INPUT_HOST'"
+
+    case "$INPUT_CMD" in
+    (put)   put ;;
+    (get)   get ;;
+    (*)     echo "::error::'cmd' must be 'put' or 'get' (not '$INPUT_CMD')"
+            exit 99
+            ;;
+    esac
+}

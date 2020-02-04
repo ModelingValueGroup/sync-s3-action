@@ -15,56 +15,43 @@ jobs:
 
       - name: "test-prepare"
         run: |
-          mkdir test-dir
-          echo test123 >test-dir/test123
+          mkdir test-dir-put
+          echo test123 > test-dir-put/test123
 
       - name: "test-put"
-        run: |
-          #
-               INPUT_TRACE=true
-                INPUT_HOST=
-              INPUT_REGION=
-              INPUT_BUCKET="mvg-test-bucket"
-          INPUT_ACCESS_KEY="${{ secrets.SCALEWAY_ACCESS_KEY }}"
-          INPUT_SECRET_KEY="${{ secrets.SCALEWAY_SECRET_KEY }}"
-              INPUT_S3_DIR=s3-dir
-           INPUT_LOCAL_DIR=test-dir
-                 INPUT_CMD=put
-          . ./entrypoint.sh
+        uses: ModelingValueGroup/sync-s3-action@master
+        with:
+          access_key: "${{ secrets.SCALEWAY_ACCESS_KEY }}"
+          secret_key: "${{ secrets.SCALEWAY_SECRET_KEY }}"
+          bucket    : mvg-test-bucket-temp
+          cmd       : put
+          local_dir : "test-dir-put"
+          s3_dir    : "s3-dir"
 
-      - name: "test-put"
-        run: |
-          #
-                INPUT_HOST=
-              INPUT_REGION=
-              INPUT_BUCKET="mvg-test-bucket"
-          INPUT_ACCESS_KEY="${{ secrets.SCALEWAY_ACCESS_KEY }}"
-          INPUT_SECRET_KEY="${{ secrets.SCALEWAY_SECRET_KEY }}"
-              INPUT_S3_DIR=s3-dir
-           INPUT_LOCAL_DIR=test-dir-2
-                 INPUT_CMD=get
-          . ./entrypoint.sh
+      - name: "test-get"
+        uses: ModelingValueGroup/sync-s3-action@master
+        with:
+          access_key: "${{ secrets.SCALEWAY_ACCESS_KEY }}"
+          secret_key: "${{ secrets.SCALEWAY_SECRET_KEY }}"
+          bucket    : mvg-test-bucket-temp
+          cmd       : get
+          local_dir : "test-dir-get"
+          s3_dir    : "s3-dir"
 
       - name: "test-cleanup"
         run: |
           #
-                INPUT_HOST=
-              INPUT_REGION=
-              INPUT_BUCKET="mvg-test-bucket"
           INPUT_ACCESS_KEY="${{ secrets.SCALEWAY_ACCESS_KEY }}"
           INPUT_SECRET_KEY="${{ secrets.SCALEWAY_SECRET_KEY }}"
-              INPUT_S3_DIR=s3-dir
-           INPUT_LOCAL_DIR=test-dir-2
-                 INPUT_CMD=nop
-          . ./entrypoint.sh
+          . ./functions.sh
+          handleArgs
+          s3cmd_ rm "s3://mvg-test-bucket-temp/s3-dir/test123"
+          s3cmd_ rm "s3://mvg-test-bucket-temp/s3-dir"
+          s3cmd_ rb "s3://mvg-test-bucket-temp"
 
-          s3cmd_ rm "s3://mvg-test-bucket/s3-dir/test123"
-          s3cmd_ rm "s3://mvg-test-bucket/s3-dir"
-          s3cmd_ rb "s3://mvg-test-bucket"
-
-      - name: "check"
+      - name: "test-check"
         run: |
-          if [[ "$(cat test-dir/test123)" != "$(cat test-dir-2/test123)" ]]; then
+          if [[ "$(cat test-dir-put/test123)" != "$(cat test-dir-get/test123)" ]]; then
             echo "::error::failed to get the test file"
             exit 88
           fi
@@ -80,7 +67,6 @@ jobs:
           cmd       : put
           local_dir : "."
           s3_dir    : "ModelingValueGroup/sync-s3-action/${{ github.ref }}"
-          trace     : true
 
       - name: "if master: try publish in S3 main dir"
         uses: ModelingValueGroup/sync-s3-action@master
@@ -91,5 +77,4 @@ jobs:
           bucket    : mvg-test-bucket-perm
           cmd       : put
           local_dir : "."
-          s3_dir    : "ModelingValueGroup/sync-s3-action/${{ github.ref }}"
-          trace     : true
+          s3_dir    : "ModelingValueGroup/sync-s3-action"
