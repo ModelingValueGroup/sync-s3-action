@@ -13,33 +13,44 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y s3cmd
 
-      - name: "test-prepare"
+      - name: "test: prepare"
         run: |
           mkdir test-dir-put
           echo test123 > test-dir-put/test123
           set
 
-      - name: "test-put"
+      - name: "test: put with branch dir"
         uses: ModelingValueGroup/sync-s3-action@master
         with:
-          access_key: "${{ secrets.SCALEWAY_ACCESS_KEY }}"
-          secret_key: "${{ secrets.SCALEWAY_SECRET_KEY }}"
-          bucket    : mvg-test-temp
-          cmd       : put
-          local_dir : "test-dir-put"
-          s3_dir    : "s3-dir"
+          access_key     : "${{ secrets.SCALEWAY_ACCESS_KEY }}"
+          secret_key     : "${{ secrets.SCALEWAY_SECRET_KEY }}"
+          bucket         : "mvg-test-perm2"
+          cmd            : "put"
+          local_dir      : "."
+          s3_dir         : "/"
+          s3_dir_branched: "true"
 
-      - name: "test-get"
+      - name: "test: put"
         uses: ModelingValueGroup/sync-s3-action@master
         with:
-          access_key: "${{ secrets.SCALEWAY_ACCESS_KEY }}"
-          secret_key: "${{ secrets.SCALEWAY_SECRET_KEY }}"
-          bucket    : mvg-test-temp
-          cmd       : get
-          local_dir : "test-dir-get"
-          s3_dir    : "s3-dir"
+          access_key     : "${{ secrets.SCALEWAY_ACCESS_KEY }}"
+          secret_key     : "${{ secrets.SCALEWAY_SECRET_KEY }}"
+          bucket         : "mvg-test-temp"
+          cmd            : "put"
+          local_dir      : "test-dir-put"
+          s3_dir         : "s3-dir"
 
-      - name: "test-cleanup"
+      - name: "test: get"
+        uses: ModelingValueGroup/sync-s3-action@master
+        with:
+          access_key     : "${{ secrets.SCALEWAY_ACCESS_KEY }}"
+          secret_key     : "${{ secrets.SCALEWAY_SECRET_KEY }}"
+          bucket         : "mvg-test-temp"
+          cmd            : "get"
+          local_dir      : "test-dir-get"
+          s3_dir         : "s3-dir"
+
+      - name: "test: cleanup"
         run: |
           #
           INPUT_ACCESS_KEY="${{ secrets.SCALEWAY_ACCESS_KEY }}"
@@ -50,35 +61,10 @@ jobs:
           s3cmd_ rm "s3://mvg-test-temp/s3-dir"
           s3cmd_ rb "s3://mvg-test-temp"
 
-      - name: "test-check"
+      - name: "test: check"
         run: |
           if [[ "$(cat test-dir-put/test123)" != "$(cat test-dir-get/test123)" ]]; then
             echo "::error::failed to get the test file"
             exit 88
           fi
           echo "# all ok"
-
-      - name: "if NOT master: try publish in S3 branch dir"
-        uses: ModelingValueGroup/sync-s3-action@master
-        if: github.ref != 'refs/heads/master'
-        with:
-          access_key     : "${{ secrets.SCALEWAY_ACCESS_KEY }}"
-          secret_key     : "${{ secrets.SCALEWAY_SECRET_KEY }}"
-          bucket         : "mvg-test-perm"
-          cmd            : "put"
-          local_dir      : "."
-          s3_dir         : "/"
-          s3_dir_branched: "true"
-
-      - name: "if master: try publish in S3 main dir"
-        uses: ModelingValueGroup/sync-s3-action@master
-        if: github.ref == 'refs/heads/master'
-        with:
-          access_key     : "${{ secrets.SCALEWAY_ACCESS_KEY }}"
-          secret_key     : "${{ secrets.SCALEWAY_SECRET_KEY }}"
-          bucket         : "mvg-test-perm"
-          cmd            : "put"
-          local_dir      : "."
-          s3_dir         : "/"
-          s3_dir_branched: "true"
-
