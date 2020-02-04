@@ -17,6 +17,7 @@ jobs:
         run: |
           mkdir test-dir-put
           echo test123 > test-dir-put/test123
+          echo "::set-env name=TEMP_BUCKET::mvg-test-temp-$RANDOM"
 
       - name: "test: put with branch dir"
         uses: ModelingValueGroup/sync-s3-action@master
@@ -34,7 +35,7 @@ jobs:
         with:
           access_key     : "${{ secrets.SCALEWAY_ACCESS_KEY }}"
           secret_key     : "${{ secrets.SCALEWAY_SECRET_KEY }}"
-          bucket         : "mvg-test-tempo"
+          bucket         : "${{ TEMP_BUCKET }}"
           cmd            : "put"
           local_dir      : "test-dir-put"
           s3_dir         : "s3-dir"
@@ -44,7 +45,7 @@ jobs:
         with:
           access_key     : "${{ secrets.SCALEWAY_ACCESS_KEY }}"
           secret_key     : "${{ secrets.SCALEWAY_SECRET_KEY }}"
-          bucket         : "mvg-test-tempo"
+          bucket         : "${{ TEMP_BUCKET }}"
           cmd            : "get"
           local_dir      : "test-dir-get"
           s3_dir         : "s3-dir"
@@ -56,9 +57,9 @@ jobs:
           INPUT_SECRET_KEY="${{ secrets.SCALEWAY_SECRET_KEY }}"
           . ./functions.sh
           handleArgs
-          s3cmd_ rm "s3://mvg-test-temp/s3-dir/test123"
-          s3cmd_ rm "s3://mvg-test-temp/s3-dir"
-          s3cmd_ rb "s3://mvg-test-temp"
+          s3cmd_ rm "s3://${{ TEMP_BUCKET }}/s3-dir/test123"
+          s3cmd_ rm "s3://${{ TEMP_BUCKET }}/s3-dir"
+          s3cmd_ rb "s3://${{ TEMP_BUCKET }}"
 
       - name: "test: check"
         run: |
