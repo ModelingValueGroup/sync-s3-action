@@ -83,7 +83,7 @@ jobs:
 
       - name: "if master: try publish in S3 main dir"
         uses: ModelingValueGroup/sync-s3-action@master
-        if: github.ref != 'refs/heads/master'
+        if: github.ref == 'refs/heads/master'
         with:
           access_key: "${{ secrets.SCALEWAY_ACC }}"
           secret_key: "${{ secrets.SCALEWAY_SEC }}"
