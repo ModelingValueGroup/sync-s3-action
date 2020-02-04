@@ -17,7 +17,6 @@ jobs:
         run: |
           mkdir test-dir
           echo test123 >test-dir/test123
-          dig s3.nl-ams.scw.cloud
 
       - name: "test-put"
         run: |

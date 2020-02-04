@@ -28,7 +28,6 @@ if [[ "${INPUT_TRACE:-false}" == "true" ]]; then
             LOCAL_DIR   \
             S3_DIR      \
         ; do
-echo \${INPUT_$name:-}
         printf "# %12s = %s\n" "$name" "$(eval "echo \${INPUT_$name:-}")"
     done
     set -x
