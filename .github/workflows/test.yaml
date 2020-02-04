@@ -22,6 +22,7 @@ jobs:
       - name: "test-put"
         run: |
           #
+               INPUT_TRACE=true
                 INPUT_HOST=
               INPUT_REGION=
               INPUT_BUCKET="mvg-test-bucket"
