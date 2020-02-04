@@ -75,7 +75,7 @@ main() {
 
     local loc="$INPUT_LOCAL_DIR/"
     local buc="s3://$INPUT_BUCKET"
-    local rem="$(sed 's|//*|/|g;s|/[.]/|/|g' <<<"$buc/$INPUT_S3_DIR/")"
+    local rem="$(sed 's|^s3:/||;s|//*|/|g;s|/[.]/|/|g;s|^|s3:/|' <<<"$buc/$INPUT_S3_DIR/")"
 
     case "$INPUT_CMD" in
     (get)   get "$buc" "$rem" "$loc";;
