@@ -74,8 +74,8 @@ jobs:
         uses: ModelingValueGroup/sync-s3-action@master
         if: github.ref != 'refs/heads/master'
         with:
-          access_key: "${{ secrets.SCALEWAY_ACC }}"
-          secret_key: "${{ secrets.SCALEWAY_SEC }}"
+          access_key: "${{ secrets.SCALEWAY_ACCESS_KEY }}"
+          secret_key: "${{ secrets.SCALEWAY_SECRET_KEY }}"
           bucket    : mvg-test-bucket-perm
           cmd       : put
           local_dir : "."
@@ -86,8 +86,8 @@ jobs:
         uses: ModelingValueGroup/sync-s3-action@master
         if: github.ref == 'refs/heads/master'
         with:
-          access_key: "${{ secrets.SCALEWAY_ACC }}"
-          secret_key: "${{ secrets.SCALEWAY_SEC }}"
+          access_key: "${{ secrets.SCALEWAY_ACCESS_KEY }}"
+          secret_key: "${{ secrets.SCALEWAY_SECRET_KEY }}"
           bucket    : mvg-test-bucket-perm
           cmd       : put
           local_dir : "."
