@@ -69,3 +69,25 @@ jobs:
             exit 88
           fi
           echo "# all ok"
+
+      - name: "if NOT master: try publish in S3 branch dir"
+        uses: ModelingValueGroup/sync-s3-action@master
+        if: github.ref != 'refs/heads/master'
+        with:
+          access_key: "${{ secrets.SCALEWAY_ACC }}"
+          secret_key: "${{ secrets.SCALEWAY_SEC }}"
+          bucket: mvg-test-bucket-perm
+          cmd: put
+          local_dir: "."
+          s3_dir: "ModelingValueGroup/sync-s3-action/${{ github.ref }}"
+
+      - name: "if master: try publish in S3 main dir"
+        uses: ModelingValueGroup/sync-s3-action@master
+        if: github.ref != 'refs/heads/master'
+        with:
+          access_key: "${{ secrets.SCALEWAY_ACC }}"
+          secret_key: "${{ secrets.SCALEWAY_SEC }}"
+          bucket    : mvg-test-bucket-perm
+          cmd       : put
+          local_dir : "."
+          s3_dir    : "ModelingValueGroup/sync-s3-action/${{ github.ref }}"
