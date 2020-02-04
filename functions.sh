@@ -35,8 +35,8 @@ handleArgs() {
         INPUT_REGION="${INPUT_REGION:-nl-ams}"
         INPUT_HOST="s3.$INPUT_REGION.scw.cloud"
     fi
-    if [[ "${S3_DIR_BRANCHED:-false}" == "true" ]]; then
-        S3_DIR="$S3_DIR/$GITHUB_REPOSITORY/$(sed 's|refs/heads/||;s|/|_|g'  <<<$GITHUB_REF)"
+    if [[ "${INPUT_S3_DIR_BRANCHED:-false}" == "true" ]]; then
+        INPUT_S3_DIR="$INPUT_S3_DIR/$GITHUB_REPOSITORY/$(sed 's|refs/heads/||;s|/|_|g'  <<<$GITHUB_REF)"
     fi
 }
 s3cmd_() {
@@ -75,7 +75,7 @@ main() {
 
     local loc="$INPUT_LOCAL_DIR/"
     local buc="s3://$INPUT_BUCKET"
-    local rem="$buc/$INPUT_S3_DIR/"
+    local rem="$(sed 's|/*|/|g;s|/[.]/|/|g' <<<"$buc/$INPUT_S3_DIR/")"
 
     case "$INPUT_CMD" in
     (get)   get "$buc" "$rem" "$loc";;
