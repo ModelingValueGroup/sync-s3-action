@@ -31,7 +31,7 @@ installS3cmd() {
     fi
 }
 handleArgs() {
-    if [[ "$INPUT_HOST" == "" ]];then
+    if [[ "${INPUT_HOST:-}" == "" ]];then
         INPUT_REGION="${INPUT_REGION:-nl-ams}"
         INPUT_HOST="s3.$INPUT_REGION.scw.cloud"
     fi
