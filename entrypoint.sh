@@ -17,20 +17,20 @@
 set -euo pipefail
 
 if [[ "${INPUT_TRACE:-false}" == "true" ]]; then
-    set -x
-    for name in \
-        TRACE\
-        HOST\
-        REGION\
-        BUCKET\
-        ACCESS_KEY\
-        SECRET_KEY\
-        CMD\
-        LOCAL_DIR\
-        S3_DIR\
+    for name in         \
+            TRACE       \
+            HOST        \
+            REGION      \
+            BUCKET      \
+            ACCESS_KEY  \
+            SECRET_KEY  \
+            CMD         \
+            LOCAL_DIR   \
+            S3_DIR      \
         ; do
-        printf "# %12s = %s\n" "$name" "$(eval "echo '${INPUT_$name:-<no value>}")"
+        printf "# %12s = %s\n" "$name" "$(eval "echo '\${INPUT_$name:-<no value>}")"
     done
+    set -x
 fi
 
 if ! command -v s3cmd >/dev/null; then
