@@ -17,7 +17,7 @@ To put some files in S3:
           local_dir: theDirOnDisk
           s3_dir: theDirInS3
 ```
-To get thhis file back:
+To get this file back:
 ```yaml
       - name: "get from S3"
         uses: ModelingValueGroup/sync-s3-action@master
