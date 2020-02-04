@@ -62,20 +62,22 @@ jobs:
         uses: ModelingValueGroup/sync-s3-action@master
         if: github.ref != 'refs/heads/master'
         with:
-          access_key: "${{ secrets.SCALEWAY_ACCESS_KEY }}"
-          secret_key: "${{ secrets.SCALEWAY_SECRET_KEY }}"
-          bucket    : mvg-test-perm
-          cmd       : put
-          local_dir : "."
-          s3_dir    : "ModelingValueGroup/sync-s3-action/${{ github.ref }}"
+          access_key     : "${{ secrets.SCALEWAY_ACCESS_KEY }}"
+          secret_key     : "${{ secrets.SCALEWAY_SECRET_KEY }}"
+          bucket         : "mvg-test-perm"
+          cmd            : "put"
+          local_dir      : "."
+          s3_dir         : "."
+          s3_dir_branched: "true"
 
       - name: "if master: try publish in S3 main dir"
         uses: ModelingValueGroup/sync-s3-action@master
         if: github.ref == 'refs/heads/master'
         with:
-          access_key: "${{ secrets.SCALEWAY_ACCESS_KEY }}"
-          secret_key: "${{ secrets.SCALEWAY_SECRET_KEY }}"
-          bucket    : mvg-test-perm
-          cmd       : put
-          local_dir : "."
-          s3_dir    : "ModelingValueGroup/sync-s3-action"
+          access_key     : "${{ secrets.SCALEWAY_ACCESS_KEY }}"
+          secret_key     : "${{ secrets.SCALEWAY_SECRET_KEY }}"
+          bucket         : "mvg-test-perm"
+          cmd            : "put"
+          local_dir      : "."
+          s3_dir         : "."
+          s3_dir_branched: "true"

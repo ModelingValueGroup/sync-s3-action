@@ -36,7 +36,7 @@ handleArgs() {
         INPUT_HOST="s3.$INPUT_REGION.scw.cloud"
     fi
     if [[ "${S3_DIR_BRANCHED:-false}" == "true" ]]; then
-        S3_DIR="$S3_DIR/"
+        S3_DIR="$S3_DIR/$GITHUB_REPOSITORY/$(sed 's|refs/heads/||;s|/|_|g'  <<<$GITHUB_REF)"
     fi
 }
 s3cmd_() {
@@ -48,26 +48,38 @@ s3cmd_() {
         "$@"
 }
 get() {
-    mkdir -p "$INPUT_LOCAL_DIR"
-    s3cmd_ --recursive get "s3://$INPUT_BUCKET/$INPUT_S3_DIR/" "$INPUT_LOCAL_DIR/"
+    local  buc="$1"; shift
+    local from="$1"; shift
+    local   to="$1"; shift
+
+    echo "# going to get from '$INPUT_HOST' from '$from' to '$to'"
+    mkdir -p "$to"
+    s3cmd_ --recursive get "$from" "$to"
 }
 put() {
-    if ! s3cmd_ ls "s3://$INPUT_BUCKET" 2>/dev/null 1>&2; then
-        echo "# bucket not found, creating bucket: $INPUT_BUCKET"
-        s3cmd_ mb "s3://$INPUT_BUCKET"
+    local  buc="$1"; shift
+    local from="$1"; shift
+    local   to="$1"; shift
+
+    echo "# going to put on '$INPUT_HOST' from '$from' to '$to'"
+    if ! s3cmd_ ls "$buc" 2>/dev/null 1>&2; then
+        echo "# bucket not found, creating bucket: $buc"
+        s3cmd_ mb "$buc"
     fi
-    s3cmd_ --recursive put "$INPUT_LOCAL_DIR/" "s3://$INPUT_BUCKET/$INPUT_S3_DIR/"
+    s3cmd_ --recursive put "$from" "$to"
 }
 main() {
     setupTracing
     installS3cmd
     handleArgs
 
-    echo "# going to '$INPUT_CMD' on '$INPUT_HOST'"
+    local loc="$INPUT_LOCAL_DIR/"
+    local buc="s3://$INPUT_BUCKET"
+    local rem="$buc/$INPUT_S3_DIR/"
 
     case "$INPUT_CMD" in
-    (put)   put ;;
-    (get)   get ;;
+    (get)   get "$buc" "$rem" "$loc";;
+    (put)   put "$buc" "$loc" "$rem";;
     (*)     echo "::error::'cmd' must be 'put' or 'get' (not '$INPUT_CMD')"
             exit 99
             ;;
