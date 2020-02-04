@@ -19,19 +19,19 @@ set -euo pipefail
 if [[ "${INPUT_TRACE:-false}" == "true" ]]; then
     set -x
     for name in \
-        INPUT_HOST\
-        INPUT_REGION\
-        INPUT_BUCKET\
-        INPUT_ACCESS_KEY\
-        INPUT_SECRET_KEY\
-        INPUT_CMD\
-        INPUT_LOCAL_DIR\
-        INPUT_S3_DIR\
+        TRACE\
+        HOST\
+        REGION\
+        BUCKET\
+        ACCESS_KEY\
+        SECRET_KEY\
+        CMD\
+        LOCAL_DIR\
+        S3_DIR\
         ; do
         printf "# %12s = %s\n" "$name" "$(eval "echo '${INPUT_$name:-<no value>}")"
     done
 fi
-
 
 if ! command -v s3cmd >/dev/null; then
     sudo apt-get update
