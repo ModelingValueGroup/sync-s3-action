@@ -10,8 +10,8 @@ To put some files in S3:
       - name: "put in S3"
         uses: ModelingValueGroup/sync-s3-action@master
         with:
-          access_key: "${{ secrets.SCALEWAY_ACC }}"
-          secret_key: "${{ secrets.SCALEWAY_SEC }}"
+          access_key: "${{ secrets.SCALEWAY_ACCESS_KEY }}"
+          secret_key: "${{ secrets.SCALEWAY_SECRET_KEY }}"
           bucket: my-bucket
           cmd: put
           local_dir: theDirOnDisk
@@ -22,8 +22,8 @@ To get this file back:
       - name: "get from S3"
         uses: ModelingValueGroup/sync-s3-action@master
         with:
-          access_key: "${{ secrets.SCALEWAY_ACC }}"
-          secret_key: "${{ secrets.SCALEWAY_SEC }}"
+          access_key: "${{ secrets.SCALEWAY_ACCESS_KEY }}"
+          secret_key: "${{ secrets.SCALEWAY_SECRET_KEY }}"
           bucket: my-bucket
           cmd: get
           local_dir: theDirOnDiskAgain
