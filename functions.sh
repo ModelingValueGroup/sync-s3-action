@@ -18,8 +18,8 @@ set -euo pipefail
 
 setupTracing() {
     if [[ "${INPUT_TRACE:-false}" == "true" ]]; then
-        for name in TRACE HOST REGION BUCKET ACCESS_KEY SECRET_KEY CMD LOCAL_DIR S3_DIR; do
-            printf "# %12s = %s\n" "$name" "$(eval "echo \${INPUT_$name:-}")"
+        for name in TRACE HOST REGION BUCKET ACCESS_KEY SECRET_KEY CMD LOCAL_DIR S3_DIR S3_DIR_BRANCHED; do
+            printf "# %16s = %s\n" "$name" "$(eval "echo \${INPUT_$name:-}")"
         done
         set -x
     fi
@@ -34,6 +34,9 @@ handleArgs() {
     if [[ "${INPUT_HOST:-}" == "" ]];then
         INPUT_REGION="${INPUT_REGION:-nl-ams}"
         INPUT_HOST="s3.$INPUT_REGION.scw.cloud"
+    fi
+    if [[ "${S3_DIR_BRANCHED:-false}" == "true" ]]; then
+        S3_DIR="$S3_DIR/"
     fi
 }
 s3cmd_() {

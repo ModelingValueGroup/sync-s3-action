@@ -3,16 +3,7 @@ description: 'get/put files from/to S3'
 author: 'Tom Brus'
 
 inputs:
-  host:
-    description: 'the s3 host (defaults to Scaleway: https://s3.$region.scw.cloud)'
-    required: false
-  region:
-    description: 'the s3 region'
-    required: false
-    default: "nl-ams"
-  bucket:
-    description: 'the s3 bucket'
-    required: true
+  # required ================================================================
   access_key:
     description: 'the AWS or Scaleway ACCESS_KEY'
     required: true
@@ -21,14 +12,29 @@ inputs:
     required: true
   cmd:
     description: 'the direction of the copy: "put" or "get"'
-    required: false
-    default: "get"
+    required: true
+  bucket:
+    description: 'the s3 bucket'
+    required: true
   local_dir:
     description: 'the local dir to copy from/to'
     required: true
   s3_dir:
     description: 'the s3 remote dir to copy to/from'
     required: true
+
+  # optional ================================================================
+  host:
+    description: 'the s3 host (defaults to Scaleway: https://s3.$region.scw.cloud)'
+    required: false
+  region:
+    description: 'the s3 region'
+    required: false
+    default: "nl-ams"
+  s3_dir_branched:
+    description: 'extend the s3 remote dir with the current branch'
+    required: false
+    default: "false"
   trace:
     description: 'set this to "true" if you would like bash-tracing'
     required: false
@@ -36,4 +42,4 @@ inputs:
 
 runs:
   using: 'node12'
-  main : 'entrypoint.js'
+  main: 'entrypoint.js'

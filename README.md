@@ -12,10 +12,10 @@ To put some files in S3:
         with:
           access_key: "${{ secrets.SCALEWAY_ACCESS_KEY }}"
           secret_key: "${{ secrets.SCALEWAY_SECRET_KEY }}"
-          bucket: my-bucket
-          cmd: put
-          local_dir: theDirOnDisk
-          s3_dir: theDirInS3
+          bucket    : my-bucket
+          cmd       : put
+          local_dir : theDirOnDisk
+          s3_dir    : theDirInS3
 ```
 To get this file back:
 ```yaml
@@ -24,8 +24,8 @@ To get this file back:
         with:
           access_key: "${{ secrets.SCALEWAY_ACCESS_KEY }}"
           secret_key: "${{ secrets.SCALEWAY_SECRET_KEY }}"
-          bucket: my-bucket
-          cmd: get
-          local_dir: theDirOnDiskAgain
-          s3_dir: theDirInS3
+          bucket    : my-bucket
+          cmd       : get
+          local_dir : theDirOnDiskAgain
+          s3_dir    : theDirInS3
 ```
