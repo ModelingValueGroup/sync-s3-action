@@ -23,7 +23,7 @@ jobs:
         with:
           access_key     : "${{ secrets.SCALEWAY_ACCESS_KEY }}"
           secret_key     : "${{ secrets.SCALEWAY_SECRET_KEY }}"
-          bucket         : "mvg-test-perm2"
+          bucket         : "mvg-test-perma"
           cmd            : "put"
           local_dir      : "."
           s3_dir         : "/"
@@ -34,7 +34,7 @@ jobs:
         with:
           access_key     : "${{ secrets.SCALEWAY_ACCESS_KEY }}"
           secret_key     : "${{ secrets.SCALEWAY_SECRET_KEY }}"
-          bucket         : "mvg-test-temp"
+          bucket         : "mvg-test-tempo"
           cmd            : "put"
           local_dir      : "test-dir-put"
           s3_dir         : "s3-dir"
@@ -44,7 +44,7 @@ jobs:
         with:
           access_key     : "${{ secrets.SCALEWAY_ACCESS_KEY }}"
           secret_key     : "${{ secrets.SCALEWAY_SECRET_KEY }}"
-          bucket         : "mvg-test-temp"
+          bucket         : "mvg-test-tempo"
           cmd            : "get"
           local_dir      : "test-dir-get"
           s3_dir         : "s3-dir"
