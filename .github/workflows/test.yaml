@@ -76,10 +76,11 @@ jobs:
         with:
           access_key: "${{ secrets.SCALEWAY_ACC }}"
           secret_key: "${{ secrets.SCALEWAY_SEC }}"
-          bucket: mvg-test-bucket-perm
-          cmd: put
-          local_dir: "."
-          s3_dir: "ModelingValueGroup/sync-s3-action/${{ github.ref }}"
+          bucket    : mvg-test-bucket-perm
+          cmd       : put
+          local_dir : "."
+          s3_dir    : "ModelingValueGroup/sync-s3-action/${{ github.ref }}"
+          trace     : true
 
       - name: "if master: try publish in S3 main dir"
         uses: ModelingValueGroup/sync-s3-action@master
@@ -91,3 +92,4 @@ jobs:
           cmd       : put
           local_dir : "."
           s3_dir    : "ModelingValueGroup/sync-s3-action/${{ github.ref }}"
+          trace     : true
