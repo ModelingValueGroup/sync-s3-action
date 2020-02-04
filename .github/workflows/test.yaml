@@ -17,7 +17,6 @@ jobs:
         run: |
           mkdir test-dir-put
           echo test123 > test-dir-put/test123
-          set
 
       - name: "test: put with branch dir"
         uses: ModelingValueGroup/sync-s3-action@master
