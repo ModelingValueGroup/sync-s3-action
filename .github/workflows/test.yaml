@@ -35,7 +35,7 @@ jobs:
         with:
           access_key     : "${{ secrets.SCALEWAY_ACCESS_KEY }}"
           secret_key     : "${{ secrets.SCALEWAY_SECRET_KEY }}"
-          bucket         : "${{ TEMP_BUCKET }}"
+          bucket         : "${{ env.TEMP_BUCKET }}"
           cmd            : "put"
           local_dir      : "test-dir-put"
           s3_dir         : "s3-dir"
@@ -45,7 +45,7 @@ jobs:
         with:
           access_key     : "${{ secrets.SCALEWAY_ACCESS_KEY }}"
           secret_key     : "${{ secrets.SCALEWAY_SECRET_KEY }}"
-          bucket         : "${{ TEMP_BUCKET }}"
+          bucket         : "${{ env.TEMP_BUCKET }}"
           cmd            : "get"
           local_dir      : "test-dir-get"
           s3_dir         : "s3-dir"
@@ -57,9 +57,9 @@ jobs:
           INPUT_SECRET_KEY="${{ secrets.SCALEWAY_SECRET_KEY }}"
           . ./functions.sh
           handleArgs
-          s3cmd_ rm "s3://${{ TEMP_BUCKET }}/s3-dir/test123"
-          s3cmd_ rm "s3://${{ TEMP_BUCKET }}/s3-dir"
-          s3cmd_ rb "s3://${{ TEMP_BUCKET }}"
+          s3cmd_ rm "s3://${{ env.TEMP_BUCKET }}/s3-dir/test123"
+          s3cmd_ rm "s3://${{ env.TEMP_BUCKET }}/s3-dir"
+          s3cmd_ rb "s3://${{ env.TEMP_BUCKET }}"
 
       - name: "test: check"
         run: |
