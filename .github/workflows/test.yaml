@@ -27,8 +27,7 @@ jobs:
           bucket         : "mvg-test-perma"
           cmd            : "put"
           local_dir      : "."
-          s3_dir         : "/"
-          s3_dir_branched: "true"
+          s3_dir_branched: "/"
 
       - name: "test: put"
         uses: ModelingValueGroup/sync-s3-action@master

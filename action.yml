@@ -16,12 +16,17 @@ inputs:
   bucket:
     description: 'the s3 bucket'
     required: true
+
+  # locations ================================================================
   local_dir:
     description: 'the local dir to copy from/to'
     required: true
   s3_dir:
     description: 'the s3 remote dir to copy to/from'
-    required: true
+    required: false
+  s3_dir_branched:
+    description: 'the s3 remote dir to copy to/from, extended with $GITHUB_REPOSITORY and the current branch'
+    required: false
 
   # optional ================================================================
   host:
@@ -31,10 +36,6 @@ inputs:
     description: 'the s3 region'
     required: false
     default: "nl-ams"
-  s3_dir_branched:
-    description: 'extend the s3 remote dir with the current branch'
-    required: false
-    default: "false"
   trace:
     description: 'set this to "true" if you would like bash-tracing'
     required: false

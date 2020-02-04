@@ -35,8 +35,12 @@ handleArgs() {
         INPUT_REGION="${INPUT_REGION:-nl-ams}"
         INPUT_HOST="s3.$INPUT_REGION.scw.cloud"
     fi
-    if [[ "${INPUT_S3_DIR_BRANCHED:-false}" == "true" ]]; then
-        INPUT_S3_DIR="$INPUT_S3_DIR/$GITHUB_REPOSITORY/$(sed 's|refs/heads/||;s|/|_|g'  <<<$GITHUB_REF)"
+    if [[ "${INPUT_S3_DIR_BRANCHED:-}" != "" && "${INPUT_S3_DIR:-}" != "" ]]; then
+        echo "::error::only pass one of: s3_dir, s3_dir_branched"
+        exit 67
+    fi
+    if [[ "${INPUT_S3_DIR_BRANCHED:-}" != "" ]]; then
+        INPUT_S3_DIR="$INPUT_S3_DIR_BRANCHED/$GITHUB_REPOSITORY/$(sed 's|refs/heads/||;s|/|_|g'  <<<$GITHUB_REF)"
     fi
 }
 s3cmd_() {
