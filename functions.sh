@@ -34,8 +34,22 @@ handleArgs() {
         exit 67
     fi
     if [[ "${INPUT_S3_DIR_BRANCHED:-}" != "" ]]; then
-        INPUT_S3_DIR="$INPUT_S3_DIR_BRANCHED/$GITHUB_REPOSITORY/$(sed 's|refs/heads/||;s|/|_|g'  <<<$GITHUB_REF)"
+        local g a v e flags
+        read g a v e flags < <(getFirstArtifactWithFlags)
+        if [[ "$g" != "" ]]; then
+            local bareBranch="$(sed 's|refs/heads/||;s|/|_|g'  <<<$GITHUB_REF)"
+            INPUT_S3_DIR="$INPUT_S3_DIR_BRANCHED/$g/$a/$bareBranch"
+        fi
     fi
+}
+getFirstArtifactWithFlags() {
+    if [[ ! -f "project.sh" ]]; then
+        echo "::error::project.sh file not found" 1>&2
+        exit 45
+    fi
+    local artifacts=()
+    . project.sh
+    printf "%s\n" "${artifacts[0]}"
 }
 installS3cmd() {
     export   S3CMD_HOST_URL="$1"; shift
