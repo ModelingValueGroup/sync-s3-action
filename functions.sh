@@ -24,12 +24,6 @@ setupTracing() {
         set -x
     fi
 }
-installS3cmd() {
-    if ! command -v s3cmd >/dev/null; then
-        sudo apt-get update
-        sudo apt-get install -y s3cmd
-    fi
-}
 handleArgs() {
     if [[ "${INPUT_HOST:-}" == "" ]];then
         INPUT_REGION="${INPUT_REGION:-nl-ams}"
@@ -43,11 +37,21 @@ handleArgs() {
         INPUT_S3_DIR="$INPUT_S3_DIR_BRANCHED/$GITHUB_REPOSITORY/$(sed 's|refs/heads/||;s|/|_|g'  <<<$GITHUB_REF)"
     fi
 }
+installS3cmd() {
+    export   S3CMD_HOST_URL="$1"; shift
+    export S3CMD_ACCESS_KEY="$1"; shift
+    export S3CMD_SECRET_KEY="$1"; shift
+
+    if ! command -v s3cmd >/dev/null; then
+        sudo apt-get update
+        sudo apt-get install -y s3cmd
+    fi
+}
 s3cmd_() {
     s3cmd                                   \
-               --host="https://$INPUT_HOST" \
-         --access_key="$INPUT_ACCESS_KEY"   \
-         --secret_key="$INPUT_SECRET_KEY"   \
+               --host="$S3CMD_HOST_URL"     \
+         --access_key="$S3CMD_ACCESS_KEY"   \
+         --secret_key="$S3CMD_SECRET_KEY"   \
         --host-bucket=                      \
         "$@"
 }
@@ -56,7 +60,7 @@ get() {
     local from="$1"; shift
     local   to="$1"; shift
 
-    echo "# going to get from '$INPUT_HOST' from '$from' to '$to'"
+    echo "# going to get from '$S3CMD_HOST_URL' from '$from' to '$to'"
     mkdir -p "$to"
     s3cmd_ --recursive get "$from" "$to"
 }
@@ -65,7 +69,7 @@ put() {
     local from="$1"; shift
     local   to="$1"; shift
 
-    echo "# going to put on '$INPUT_HOST' from '$from' to '$to'"
+    echo "# going to put on '$S3CMD_HOST_URL' from '$from' to '$to'"
     if ! s3cmd_ ls "$buc" 2>/dev/null 1>&2; then
         echo "# bucket not found, creating bucket: $buc"
         s3cmd_ mb "$buc"
@@ -74,8 +78,9 @@ put() {
 }
 main() {
     setupTracing
-    installS3cmd
     handleArgs
+
+    installS3cmd "https://$INPUT_HOST" "$INPUT_ACCESS_KEY" "$INPUT_SECRET_KEY"
 
     local loc="$INPUT_LOCAL_DIR/"
     local buc="s3://$INPUT_BUCKET"
