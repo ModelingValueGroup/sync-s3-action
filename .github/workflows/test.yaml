@@ -27,8 +27,9 @@ jobs:
           secret_key     : "${{ secrets.SCALEWAY_SECRET_KEY }}"
           bucket         : "mvg-test-perma"
           cmd            : "put"
-          local_dir      : "."
+          local_dir      : "test-dir-put"
           s3_dir_branched: "/"
+          trace:true
 
       - name: "test: put"
         uses: ModelingValueGroup/sync-s3-action@master
