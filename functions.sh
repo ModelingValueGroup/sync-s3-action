@@ -130,15 +130,40 @@ triggerOther() {
     local branch="$1"; shift
 
     echo "====== trigger: $repo  [$branch]"
-    set -x
-    curl \
-        -XPOST \
-        -u "automation:$INPUT_TRIGGER_TOKEN" \
-        -H "Accept: application/vnd.github.everest-preview+json"  \
-        -H "Content-Type: application/json" \
-        "https://api.github.com/repos/$repo/dispatches" \
-        --data '{"event_type": "build_application","client_payload": { "branch": "'"$branch"'" }}'
 
+    local i conclusion status rerunUrl
+    for i in $(seq 0 600); do
+        curl -s \
+            -u "automation:$INPUT_TRIGGER_TOKEN"  \
+            "https://api.github.com/repos/$repo/actions/runs?status=failure&branch=$branch" \
+            -o runs.json
+        conclusion="$(firstFieldFromJson runs.json "conclusion")"
+        if [[ "$conclusion" != null ]]; then
+            break
+        fi
+        echo "::info:: waiting for build on $repo branch $branch to finish ($i)"
+        sleep 2
+    done
+    if [[ "$conclusion" == null ]]; then
+        echo "::warning::the build on $repo branch $branch did not finish in time"
+    else
+        status="$(firstFieldFromJson runs.json "status")"
+        echo "::info:: status: $status"
+        if [[ "$status" == failure ]]; then
+            rerunUrl="$(firstFieldFromJson runs.json "rerun_url")"
+            curl -s \
+            -u "automation:$INPUT_TRIGGER_TOKEN"  \
+            "$rerunUrl"
+        fi
+    fi
+}
+firstFieldFromJson() {
+    local  file="$1"; shift
+    local field="$1"; shift
+
+    egrep "^ *\"$field\": " "$file" \
+        | head -1 \
+        | sed 's/^[^:]*: *//;s/,$//;s/"//g'
 }
 main() {
     setupTracing
