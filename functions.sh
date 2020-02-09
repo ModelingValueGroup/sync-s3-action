@@ -29,6 +29,8 @@ export INPUT_VARS=(
     LOCAL_DIR
     S3_DIR
     S3_DIR_BRANCHED
+    TRIGGER_USER
+    TRIGGER_TOKEN
 )
 
 setupTracing() {
@@ -108,7 +110,7 @@ put() {
 trigger() {
     local   to="$1"; shift
 
-    if [[ "${INPUT_S3_DIR_BRANCHED:-}" != "" ]]; then
+    if [[ "${INPUT_S3_DIR_BRANCHED:-}" != "" && "$INPUT_TRIGGER_USER" != "" && "$INPUT_TRIGGER_TOKEN" != "" ]]; then
         if [[ "$(s3cmd_ ls "$to$TRIGGERS_DIR/" | wc -l)" != 0 ]]; then
             local triggersTmpDir="$TRIGGERS_DIR-$$/"
             mkdir -p "$triggersTmpDir"
@@ -131,7 +133,7 @@ triggerOther() {
     echo "====== trigger: $repo  [$branch]"
     curl \
         -XPOST \
-        -u "secrets.PAT_USERNAME:secrets.PAT_TOKEN" \
+        -u "$INPUT_TRIGGER_USER:$INPUT_TRIGGER_TOKEN" \
         -H "Accept: application/vnd.github.everest-preview+json"  \
         -H "Content-Type: application/json" \
         "https://api.github.com/repos/$repo/dispatches" \

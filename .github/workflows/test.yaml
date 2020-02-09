@@ -25,6 +25,8 @@ jobs:
         with:
           access_key     : "${{ secrets.SCALEWAY_ACCESS_KEY }}"
           secret_key     : "${{ secrets.SCALEWAY_SECRET_KEY }}"
+          trigger_user   : "${{ secrets.RETRIGGER_USER }}"
+          trigger_token  : "${{ secrets.RETRIGGER_TOKEN }}"
           bucket         : "mvg-test-perma"
           cmd            : "put"
           local_dir      : "test-dir-put"
