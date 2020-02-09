@@ -109,6 +109,7 @@ trigger() {
     local   to="$1"; shift
 
     if [[ "${INPUT_S3_DIR_BRANCHED:-}" != "" ]]; then
+set -x
         if [[ "$(s3cmd_ ls "$to$TRIGGERS_DIR/" | wc -l)" != 0 ]]; then
             local triggersTmpDir="$TRIGGERS_DIR-$$/"
             s3cmd_ --recursive get "$to$TRIGGERS_DIR/" "$triggersTmpDir"
