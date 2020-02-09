@@ -130,6 +130,7 @@ triggerOther() {
     local branch="$1"; shift
 
     echo "====== trigger: $repo  [$branch]"
+set -x
 
     local i conclusion status rerunUrl
     for i in $(seq 0 600); do
