@@ -18,6 +18,7 @@ jobs:
           mkdir test-dir-put
           echo test123 > test-dir-put/test123
           echo "::set-env name=TEMP_BUCKET::mvg-test-temp-$RANDOM"
+          printf 'artifacts=("org.modelingvalue testing123 47.11 jar j--")\n' > project.sh
 
       - name: "test: put with branch dir"
         uses: ModelingValueGroup/sync-s3-action@master
