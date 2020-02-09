@@ -132,21 +132,27 @@ triggerOther() {
     echo "====== trigger: $repo  [$branch]"
 set -x
 
-    local i conclusion status rerunUrl
+    local i total_count conclusion status rerunUrl
     for i in $(seq 0 600); do
         curl -s \
             -u "automation:$INPUT_TRIGGER_TOKEN"  \
-            "https://api.github.com/repos/$repo/actions/runs?status=failure&branch=$branch" \
+            "https://api.github.com/repos/$repo/actions/runs?branch=$branch" \
             -o runs.json
 sed 's/^/   >>> /' runs.json
+        total_count="$(firstFieldFromJson runs.json "total_count")"
+        if [[ "$total_count" == 0 ]]; then
+            break
+        fi
         conclusion="$(firstFieldFromJson runs.json "conclusion")"
-        if [[ "$conclusion" != null ]]; then
+        if [[ "$conclusion" != "null" ]]; then
             break
         fi
         echo "::info:: waiting for build on $repo branch $branch to finish ($i)"
         sleep 2
     done
-    if [[ "$conclusion" == null ]]; then
+    if [[ "$total_count" == 0 ]]; then
+        echo "::warning:: no build on $repo branch $branch, retrigger impossible..."
+    elif [[ "$conclusion" == "null" ]]; then
         echo "::warning::the build on $repo branch $branch did not finish in time"
     else
         status="$(firstFieldFromJson runs.json "status")"
