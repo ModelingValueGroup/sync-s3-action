@@ -136,7 +136,6 @@ triggerOther() {
             -u "automation:$INPUT_TRIGGER_TOKEN"  \
             "https://api.github.com/repos/$repo/actions/runs?branch=$branch" \
             -o runs.json
-sed 's/^/   >>> /' runs.json
         total_count="$(firstFieldFromJson runs.json "total_count")"
         if [[ "$total_count" == 0 ]]; then
             break
@@ -158,10 +157,12 @@ sed 's/^/   >>> /' runs.json
         if [[ "$conclusion" != failure ]]; then
             echo "::warning::the latest build on $repo branch $branch did not finish with failure (but $conclusion), retrigger impossible..."
         else
+sed 's/^/   >>> /' runs.json
             rerunUrl="$(firstFieldFromJson runs.json "rerun_url")"
             curl -s \
-            -u "automation:$INPUT_TRIGGER_TOKEN"  \
-            "$rerunUrl"
+                -XPOST \
+                -u "automation:$INPUT_TRIGGER_TOKEN"  \
+                "$rerunUrl"
         fi
     fi
 }
