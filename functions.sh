@@ -109,7 +109,7 @@ put() {
 trigger() {
     local   to="$1"; shift
 
-    if [[ "${INPUT_S3_DIR_BRANCHED:-}" != "" && "$INPUT_TRIGGER_USER" != "" && "$INPUT_TRIGGER_TOKEN" != "" ]]; then
+    if [[ "${INPUT_S3_DIR_BRANCHED:-}" != "" && "$INPUT_TRIGGER_TOKEN" != "" ]]; then
         if [[ "$(s3cmd_ ls "$to$TRIGGERS_DIR/" | wc -l)" != 0 ]]; then
             local triggersTmpDir="$TRIGGERS_DIR-$$/"
             mkdir -p "$triggersTmpDir"
