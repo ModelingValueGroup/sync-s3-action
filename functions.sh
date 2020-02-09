@@ -134,7 +134,7 @@ triggerOther() {
     set -x
     curl \
         -XPOST \
-        -u "$INPUT_TRIGGER_USER:$INPUT_TRIGGER_TOKEN" \
+        -u "automation:$INPUT_TRIGGER_TOKEN" \
         -H "Accept: application/vnd.github.everest-preview+json"  \
         -H "Content-Type: application/json" \
         "https://api.github.com/repos/$repo/dispatches" \
