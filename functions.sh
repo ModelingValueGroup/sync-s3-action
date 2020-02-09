@@ -129,8 +129,7 @@ triggerOther() {
     local   repo="$1"; shift
     local branch="$1"; shift
 
-    echo "====== trigger: $repo  [$branch]"
-
+    echo "====== triggering: $repo  [$branch]"
     local i total_count conclusion rerunUrl
     for i in $(seq 0 600); do
         curl -s \
