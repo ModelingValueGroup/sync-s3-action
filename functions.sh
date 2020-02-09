@@ -89,6 +89,20 @@ put() {
         s3cmd_ mb "$buc"
     fi
     s3cmd_ --recursive put "$from" "$to"
+
+    if [[ "$INPUT_TRIGGERS" == "true" ]]; then
+        local triggersDir="triggers-$$"
+        s3cmd_ get "$to/triggers" "$triggersDir"
+        local f
+        for f in $triggersDir/*.trigger; do
+            if [[ -f "$f" ]]; then
+                # TODO: do the actual triggering
+                echo "found trigger file: $f:"
+                sed 's/^/       /' "$f"
+            fi
+        done
+        rm -rf "$triggersDir"
+    fi
 }
 main() {
     setupTracing
