@@ -10,9 +10,6 @@ inputs:
   secret_key:
     description: 'the AWS or Scaleway SECRET_KEY'
     required: true
-  trigger_user:
-    description: 'the Github user to use for retriggering'
-    required: true
   trigger_token:
     description: 'the Github token to use for retriggering'
     required: true
