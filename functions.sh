@@ -89,6 +89,9 @@ put() {
         s3cmd_ mb "$buc"
     fi
     s3cmd_ --recursive put "$from" "$to"
+}
+trigger() {
+    local   to="$1"; shift
 
     if [[ "$INPUT_TRIGGERS" == "true" ]]; then
         local triggersDir="triggers-$$"
@@ -115,10 +118,16 @@ main() {
     local rem="$(sed 's|^s3:/||;s|//*|/|g;s|/[.]/|/|g;s|^|s3:/|' <<<"$buc/$INPUT_S3_DIR/")"
 
     case "$INPUT_CMD" in
-    (get)   get "$buc" "$rem" "$loc";;
-    (put)   put "$buc" "$loc" "$rem";;
-    (*)     echo "::error::'cmd' must be 'put' or 'get' (not '$INPUT_CMD')"
-            exit 99
-            ;;
+    (get)
+        get "$buc" "$rem" "$loc"
+        ;;
+    (put)
+        put "$buc" "$loc" "$rem"
+        trigger "$rem"
+        ;;
+    (*)
+        echo "::error::'cmd' must be 'put' or 'get' (not '$INPUT_CMD')"
+        exit 99
+        ;;
     esac
 }
