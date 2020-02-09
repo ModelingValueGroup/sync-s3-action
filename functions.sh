@@ -29,7 +29,6 @@ export INPUT_VARS=(
     LOCAL_DIR
     S3_DIR
     S3_DIR_BRANCHED
-    TRIGGERS
 )
 
 setupTracing() {
@@ -109,7 +108,7 @@ put() {
 trigger() {
     local   to="$1"; shift
 
-    if [[ "$INPUT_TRIGGERS" == "true" ]]; then
+    if [[ "${INPUT_S3_DIR_BRANCHED:-}" != "" ]]; then
         if [[ "$(s3cmd_ ls "$to$TRIGGERS_DIR/" | wc -l)" != 0 ]]; then
             local triggersTmpDir="$TRIGGERS_DIR-$$"
             s3cmd_ get "$to$TRIGGERS_DIR/" "$triggersTmpDir"
