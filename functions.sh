@@ -16,9 +16,25 @@
 
 set -euo pipefail
 
+export PROJECT_SH="project.sh"
+export TRIGGERS_DIR="triggers"
+export INPUT_VARS=(
+    TRACE
+    HOST
+    REGION
+    BUCKET
+    ACCESS_KEY
+    SECRET_KEY
+    CMD
+    LOCAL_DIR
+    S3_DIR
+    S3_DIR_BRANCHED
+    TRIGGERS
+)
+
 setupTracing() {
     if [[ "${INPUT_TRACE:-false}" == "true" ]]; then
-        for name in TRACE HOST REGION BUCKET ACCESS_KEY SECRET_KEY CMD LOCAL_DIR S3_DIR S3_DIR_BRANCHED; do
+        for name in "${INPUT_VARS[@]}"; do
             printf "# %16s = %s\n" "$name" "$(eval "echo \${INPUT_$name:-}")"
         done
         set -x
@@ -43,12 +59,12 @@ handleArgs() {
     fi
 }
 getFirstArtifactWithFlags() {
-    if [[ ! -f "project.sh" ]]; then
-        echo "::error::project.sh file not found" 1>&2
+    if [[ ! -f "$PROJECT_SH" ]]; then
+        echo "::error::$PROJECT_SH file not found" 1>&2
         exit 45
     fi
     local artifacts=()
-    . project.sh
+    . $PROJECT_SH
     printf "%s\n" "${artifacts[0]}"
 }
 installS3cmd() {
@@ -94,17 +110,19 @@ trigger() {
     local   to="$1"; shift
 
     if [[ "$INPUT_TRIGGERS" == "true" ]]; then
-        local triggersDir="triggers-$$"
-        s3cmd_ get "$to/triggers" "$triggersDir"
-        local f
-        for f in $triggersDir/*.trigger; do
-            if [[ -f "$f" ]]; then
-                # TODO: do the actual triggering
-                echo "found trigger file: $f:"
-                sed 's/^/       /' "$f"
-            fi
-        done
-        rm -rf "$triggersDir"
+        if [[ "$(s3cmd_ ls "$to$TRIGGERS_DIR/" | wc -l)" != 0 ]]; then
+            local triggersTmpDir="$TRIGGERS_DIR-$$"
+            s3cmd_ get "$to$TRIGGERS_DIR/" "$triggersTmpDir"
+            local f
+            for f in $triggersTmpDir/*.trigger; do
+                if [[ -f "$f" ]]; then
+                    # TODO: do the actual triggering
+                    echo "found trigger file: $f:"
+                    sed 's/^/       /' "$f"
+                fi
+            done
+            rm -rf "$triggersTmpDir"
+        fi
     fi
 }
 triggerOther() {
