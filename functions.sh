@@ -157,8 +157,8 @@ triggerOther() {
         if [[ "$conclusion" != failure ]]; then
             echo "::warning::the latest build on $repo branch $branch did not finish with failure (but $conclusion), retrigger impossible..."
         else
-sed 's/^/   >>> /' runs.json
             rerunUrl="$(firstFieldFromJson runs.json "rerun_url")"
+            echo "::info::triggering: $rerunUrl"
             curl -s \
                 -XPOST \
                 -u "automation:$INPUT_TRIGGER_TOKEN"  \
