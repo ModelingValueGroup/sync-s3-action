@@ -138,6 +138,7 @@ triggerOther() {
         -H "Content-Type: application/json" \
         "https://api.github.com/repos/$repo/dispatches" \
         --data '{"event_type": "build_application","client_payload": { "branch": "'"$branch"'" }}'
+
 }
 main() {
     setupTracing
