@@ -8,6 +8,9 @@ jobs:
       - name: "checkout"
         uses: actions/checkout@v1
 
+      - name: "DELIBERATE FAILURE FOR TEST PURPOSE"
+        run: exit 55
+
       - name: "install s3cmd"
         run: |
           sudo apt-get update
