@@ -138,6 +138,7 @@ set -x
             -u "automation:$INPUT_TRIGGER_TOKEN"  \
             "https://api.github.com/repos/$repo/actions/runs?status=failure&branch=$branch" \
             -o runs.json
+sed 's/^/   >>> /' runs.json
         conclusion="$(firstFieldFromJson runs.json "conclusion")"
         if [[ "$conclusion" != null ]]; then
             break
