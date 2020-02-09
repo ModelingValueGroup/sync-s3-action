@@ -131,6 +131,7 @@ triggerOther() {
     local branch="$1"; shift
 
     echo "====== trigger: $repo  [$branch]"
+    set -x
     curl \
         -XPOST \
         -u "$INPUT_TRIGGER_USER:$INPUT_TRIGGER_TOKEN" \
