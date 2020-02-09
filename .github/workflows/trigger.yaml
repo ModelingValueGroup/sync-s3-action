@@ -1,7 +1,7 @@
 name: trigger
 on  : repository_dispatch
 jobs:
-  test:
+  trigger:
     runs-on: [ubuntu-latest]
     steps:
       - name: "checkout"
