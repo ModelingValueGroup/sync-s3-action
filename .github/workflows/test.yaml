@@ -29,7 +29,7 @@ jobs:
           cmd            : "put"
           local_dir      : "test-dir-put"
           s3_dir_branched: "/"
-          trace:true
+          trace          : true
 
       - name: "test: put"
         uses: ModelingValueGroup/sync-s3-action@master
