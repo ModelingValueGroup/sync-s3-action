@@ -50,10 +50,11 @@ handleArgs() {
         exit 67
     fi
     if [[ "${INPUT_S3_DIR_BRANCHED:-}" != "" ]]; then
-        local g a v e flags
-        read g a v e flags < <(getFirstArtifactWithFlags)
+        local g a v e flags bareBranch
+        # shellcheck disable=SC2034
+        read -r g a v e flags < <(getFirstArtifactWithFlags)
         if [[ "$g" != "" ]]; then
-            local bareBranch="$(sed 's|refs/heads/||;s|/|_|g'  <<<$GITHUB_REF)"
+            bareBranch="$(sed 's|refs/heads/||;s|/|_|g'  <<<"$GITHUB_REF")"
             INPUT_S3_DIR="$INPUT_S3_DIR_BRANCHED/$g/$a/$bareBranch"
         fi
     fi
@@ -115,7 +116,7 @@ trigger() {
             mkdir -p "$triggersTmpDir"
             s3cmd_ --recursive get "$to$TRIGGERS_DIR/" "$triggersTmpDir"
             local f
-            for f in $triggersTmpDir/*.trigger; do
+            for f in "$triggersTmpDir"/*.trigger; do
                 if [[ -f "$f" ]]; then
                     . "$f"
                     triggerOther "$TRIGGER_REPOSITORY" "$TRIGGER_BRANCH"
@@ -170,7 +171,7 @@ firstFieldFromJson() {
     local  file="$1"; shift
     local field="$1"; shift
 
-    egrep "^ *\"$field\": " "$file" \
+    grep -E "^ *\"$field\": " "$file" \
         | head -1 \
         | sed 's/^[^:]*: *//;s/,$//;s/"//g'
 }
@@ -180,9 +181,10 @@ main() {
 
     installS3cmd "https://$INPUT_HOST" "$INPUT_ACCESS_KEY" "$INPUT_SECRET_KEY"
 
-    local loc="$INPUT_LOCAL_DIR/"
-    local buc="s3://$INPUT_BUCKET"
-    local rem="$(sed 's|^s3:/||;s|//*|/|g;s|/[.]/|/|g;s|^|s3:/|' <<<"$buc/$INPUT_S3_DIR/")"
+    local loc buc rem
+    loc="$INPUT_LOCAL_DIR/"
+    buc="s3://$INPUT_BUCKET"
+    rem="$(sed 's|^s3:/||;s|//*|/|g;s|/[.]/|/|g;s|^|s3:/|' <<<"$buc/$INPUT_S3_DIR/")"
 
     case "$INPUT_CMD" in
     (get)
