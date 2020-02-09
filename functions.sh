@@ -131,7 +131,7 @@ triggerOther() {
 
     echo "====== trigger: $repo  [$branch]"
 
-    local i total_count conclusion status rerunUrl
+    local i total_count conclusion rerunUrl
     for i in $(seq 0 600); do
         curl -s \
             -u "automation:$INPUT_TRIGGER_TOKEN"  \
@@ -154,10 +154,10 @@ sed 's/^/   >>> /' runs.json
     elif [[ "$conclusion" == "null" ]]; then
         echo "::warning::the build on $repo branch $branch did not finish in time"
     else
-        status="$(firstFieldFromJson runs.json "status")"
-        echo "::info:: status: $status"
-        if [[ "$status" != failure ]]; then
-            echo "::warning::the latest build on $repo branch $branch did not finish with failure (but $status), retrigger impossible..."
+        conclusion="$(firstFieldFromJson runs.json "conclusion")"
+        echo "::info:: conclusion: $conclusion"
+        if [[ "$conclusion" != failure ]]; then
+            echo "::warning::the latest build on $repo branch $branch did not finish with failure (but $conclusion), retrigger impossible..."
         else
             rerunUrl="$(firstFieldFromJson runs.json "rerun_url")"
             curl -s \
