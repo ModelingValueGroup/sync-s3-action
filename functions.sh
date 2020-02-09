@@ -149,7 +149,9 @@ triggerOther() {
     else
         status="$(firstFieldFromJson runs.json "status")"
         echo "::info:: status: $status"
-        if [[ "$status" == failure ]]; then
+        if [[ "$status" != failure ]]; then
+            echo "::warning::the latest build on $repo branch $branch did not finish with failure (but $status), retrigger impossible..."
+        else
             rerunUrl="$(firstFieldFromJson runs.json "rerun_url")"
             curl -s \
             -u "automation:$INPUT_TRIGGER_TOKEN"  \
