@@ -1,0 +1,12 @@
+name: trigger
+on  : repository_dispatch
+jobs:
+  test:
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: "checkout"
+        uses: actions/checkout@v1
+
+      - name: "install s3cmd"
+        run: |
+          echo triggered

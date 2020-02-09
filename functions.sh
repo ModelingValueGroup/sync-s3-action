@@ -113,13 +113,11 @@ trigger() {
             local triggersTmpDir="$TRIGGERS_DIR-$$/"
             mkdir -p "$triggersTmpDir"
             s3cmd_ --recursive get "$to$TRIGGERS_DIR/" "$triggersTmpDir"
-            ls -al "$triggersTmpDir"
             local f
             for f in $triggersTmpDir/*.trigger; do
                 if [[ -f "$f" ]]; then
-                    # TODO: do the actual triggering
-                    echo "found trigger file: $f:"
-                    sed 's/^/       /' "$f"
+                    . "$f"
+                    triggerOther "$TRIGGER_REPOSITORY" "$TRIGGER_BRANCH"
                 fi
             done
             rm -rf "$triggersTmpDir"
@@ -127,12 +125,16 @@ trigger() {
     fi
 }
 triggerOther() {
+    local   repo="$1"; shift
+    local branch="$1"; shift
+
+    echo "====== trigger: $repo  [$branch]"
     curl \
         -XPOST \
-        -u "${{ secrets.PAT_USERNAME}}:${{secrets.PAT_TOKEN}}" \
+        -u "secrets.PAT_USERNAME:secrets.PAT_TOKEN" \
         -H "Accept: application/vnd.github.everest-preview+json"  \
         -H "Content-Type: application/json" \
-        "https://api.github.com/repos/YOURNAME/APPLICATION_NAME/dispatches" \
+        "https://api.github.com/repos/$repo/dispatches" \
         --data '{"event_type": "build_application"}'
 }
 main() {
@@ -151,7 +153,6 @@ main() {
         ;;
     (put)
         put "$buc" "$loc" "$rem"
-set -x
         trigger "$rem"
         ;;
     (*)
