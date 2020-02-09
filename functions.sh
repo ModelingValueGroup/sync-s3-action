@@ -137,7 +137,7 @@ triggerOther() {
         -H "Accept: application/vnd.github.everest-preview+json"  \
         -H "Content-Type: application/json" \
         "https://api.github.com/repos/$repo/dispatches" \
-        --data '{"event_type": "build_application","branch": "test_branch"}'
+        --data '{"event_type": "build_application","client_payload": { "branch": "'"$branch"'" }}'
 }
 main() {
     setupTracing
