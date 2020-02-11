@@ -22,6 +22,7 @@ includeBuildToolsVersion() {
 
     local url="https://maven.pkg.github.com/ModelingValueGroup/buildTools/org.modelingvalue.buildTools/$version/buildTools-$version.jar"
 
+    rm -f "buildTools.jar"
     curl -s -H "Authorization: bearer $token" -L "$url" -o "buildTools.jar"
     if [[ "$(file "buildTools.jar")" =~ .*text.* ]]; then
         echo "::error::could not download buildTools jar from: $url"
