@@ -8,11 +8,6 @@ jobs:
       - name: "checkout"
         uses: actions/checkout@v1
 
-      - name: "install s3cmd"
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y s3cmd
-
       - name: "test: prepare"
         run: |
           mkdir test-dir-put
@@ -23,9 +18,10 @@ jobs:
       - name: "test: put with branch dir"
         uses: ModelingValueGroup/sync-s3-action@master
         with:
+          token          : "${{ secrets.GITHUB_TOKEN }}"
+          trigger_token  : "${{ secrets.RETRIGGER_TOKEN }}"
           access_key     : "${{ secrets.SCALEWAY_ACCESS_KEY }}"
           secret_key     : "${{ secrets.SCALEWAY_SECRET_KEY }}"
-          trigger_token  : "${{ secrets.RETRIGGER_TOKEN }}"
           bucket         : "mvg-test-perma"
           cmd            : "put"
           local_dir      : "test-dir-put"
@@ -34,6 +30,8 @@ jobs:
       - name: "test: put"
         uses: ModelingValueGroup/sync-s3-action@master
         with:
+          token          : "${{ secrets.GITHUB_TOKEN }}"
+          trigger_token  : "${{ secrets.RETRIGGER_TOKEN }}"
           access_key     : "${{ secrets.SCALEWAY_ACCESS_KEY }}"
           secret_key     : "${{ secrets.SCALEWAY_SECRET_KEY }}"
           bucket         : "${{ env.TEMP_BUCKET }}"
@@ -44,6 +42,8 @@ jobs:
       - name: "test: get"
         uses: ModelingValueGroup/sync-s3-action@master
         with:
+          token          : "${{ secrets.GITHUB_TOKEN }}"
+          trigger_token  : "${{ secrets.RETRIGGER_TOKEN }}"
           access_key     : "${{ secrets.SCALEWAY_ACCESS_KEY }}"
           secret_key     : "${{ secrets.SCALEWAY_SECRET_KEY }}"
           bucket         : "${{ env.TEMP_BUCKET }}"
