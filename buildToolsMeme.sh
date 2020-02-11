@@ -31,6 +31,8 @@ includeBuildToolsVersion() {
     fi
     . <(java -jar "buildTools.jar")
     echo "INFO: installed buildTools version $version"
+ls -l
+md5sum "buildTools.jar"
 }
 includeBuildTools() {
     local   token="$1"; shift
