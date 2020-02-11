@@ -1,6 +1,5 @@
 .DS_Store
 .env
-/buildTools.jar
 /header
 /.idea/**/workspace.xml
 /.idea/**/tasks.xml
