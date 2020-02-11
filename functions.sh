@@ -16,186 +16,55 @@
 
 set -euo pipefail
 
-export PROJECT_SH="project.sh"
-export TRIGGERS_DIR="triggers"
-export INPUT_VARS=(
-    TRACE
-    HOST
-    REGION
-    BUCKET
-    ACCESS_KEY
-    SECRET_KEY
-    CMD
-    LOCAL_DIR
-    S3_DIR
-    S3_DIR_BRANCHED
-    TRIGGER_TOKEN
-)
+main() {
+    local      access_key="$1"; shift
+    local      secret_key="$1"; shift
+    local   trigger_token="$1"; shift
+    local             cmd="$1"; shift
+    local          bucket="$1"; shift
+    local       local_dir="$1"; shift
+    local          s3_dir="$1"; shift
+    local s3_dir_branched="$1"; shift
+    local            host="$1"; shift
+    local          region="$1"; shift
 
-setupTracing() {
-    if [[ "${INPUT_TRACE:-false}" == "true" ]]; then
-        for name in "${INPUT_VARS[@]}"; do
-            printf "# %16s = %s\n" "$name" "$(eval "echo \${INPUT_$name:-}")"
-        done
-        set -x
+    if [[ "${host:-}" == "" ]];then
+        region="${region:-nl-ams}"
+          host="s3.region.scw.cloud"
     fi
-}
-handleArgs() {
-    if [[ "${INPUT_HOST:-}" == "" ]];then
-        INPUT_REGION="${INPUT_REGION:-nl-ams}"
-        INPUT_HOST="s3.$INPUT_REGION.scw.cloud"
-    fi
-    if [[ "${INPUT_S3_DIR_BRANCHED:-}" != "" && "${INPUT_S3_DIR:-}" != "" ]]; then
+    if [[ "${s3_dir_branched:-}" != "" && "${s3_dir:-}" != "" ]]; then
         echo "::error::only pass one of: s3_dir, s3_dir_branched"
         exit 67
     fi
-    if [[ "${INPUT_S3_DIR_BRANCHED:-}" != "" ]]; then
+    if [[ "${s3_dir_branched:-}" != "" ]]; then
         local g a v e flags bareBranch
         # shellcheck disable=SC2034
         read -r g a v e flags < <(getFirstArtifactWithFlags)
         if [[ "$g" != "" ]]; then
-            bareBranch="$(sed 's|refs/heads/||;s|/|_|g'  <<<"$GITHUB_REF")"
-            INPUT_S3_DIR="$INPUT_S3_DIR_BRANCHED/$g/$a/$bareBranch"
+            bareBranch="$(sed 's|refs/heads/||;s|/|_|g' <<<"$GITHUB_REF")"
+            s3_dir="$s3_dir_branched/$g/$a/$bareBranch"
         fi
     fi
-}
-getFirstArtifactWithFlags() {
-    if [[ ! -f "$PROJECT_SH" ]]; then
-        echo "::error::$PROJECT_SH file not found" 1>&2
-        exit 45
-    fi
-    local artifacts=()
-    . $PROJECT_SH
-    printf "%s\n" "${artifacts[0]}"
-}
-installS3cmd() {
-    export   S3CMD_HOST_URL="$1"; shift
-    export S3CMD_ACCESS_KEY="$1"; shift
-    export S3CMD_SECRET_KEY="$1"; shift
 
-    if ! command -v s3cmd >/dev/null; then
-        sudo apt-get update
-        sudo apt-get install -y s3cmd
-    fi
-}
-s3cmd_() {
-    s3cmd                                   \
-               --host="$S3CMD_HOST_URL"     \
-         --access_key="$S3CMD_ACCESS_KEY"   \
-         --secret_key="$S3CMD_SECRET_KEY"   \
-        --host-bucket=                      \
-        "$@"
-}
-get() {
-    local  buc="$1"; shift
-    local from="$1"; shift
-    local   to="$1"; shift
-
-    echo "# going to get from '$S3CMD_HOST_URL' from '$from' to '$to'"
-    mkdir -p "$to"
-    s3cmd_ --recursive get "$from" "$to"
-}
-put() {
-    local  buc="$1"; shift
-    local from="$1"; shift
-    local   to="$1"; shift
-
-    echo "# going to put on '$S3CMD_HOST_URL' from '$from' to '$to'"
-    if ! s3cmd_ ls "$buc" 2>/dev/null 1>&2; then
-        echo "# bucket not found, creating bucket: $buc"
-        s3cmd_ mb "$buc"
-    fi
-    s3cmd_ --recursive put "$from" "$to"
-}
-trigger() {
-    local   to="$1"; shift
-
-    if [[ "${INPUT_S3_DIR_BRANCHED:-}" != "" && "$INPUT_TRIGGER_TOKEN" != "" ]]; then
-        if [[ "$(s3cmd_ ls "$to$TRIGGERS_DIR/" | wc -l)" != 0 ]]; then
-            local triggersTmpDir="$TRIGGERS_DIR-$$/"
-            mkdir -p "$triggersTmpDir"
-            s3cmd_ --recursive get "$to$TRIGGERS_DIR/" "$triggersTmpDir"
-            local f
-            for f in "$triggersTmpDir"/*.trigger; do
-                if [[ -f "$f" ]]; then
-                    . "$f"
-                    triggerOther "$TRIGGER_REPOSITORY" "$TRIGGER_BRANCH"
-                fi
-            done
-            rm -rf "$triggersTmpDir"
-        fi
-    fi
-}
-triggerOther() {
-    local   repo="$1"; shift
-    local branch="$1"; shift
-
-    echo "====== triggering: $repo  [$branch]"
-    local i total_count conclusion rerunUrl
-    for i in $(seq 0 600); do
-        curl -s \
-            -u "automation:$INPUT_TRIGGER_TOKEN"  \
-            "https://api.github.com/repos/$repo/actions/runs?branch=$branch" \
-            -o runs.json
-        total_count="$(firstFieldFromJson runs.json "total_count")"
-        if [[ "$total_count" == 0 ]]; then
-            break
-        fi
-        conclusion="$(firstFieldFromJson runs.json "conclusion")"
-        if [[ "$conclusion" != "null" ]]; then
-            break
-        fi
-        echo "::info:: waiting for build on $repo branch $branch to finish ($i)"
-        sleep 2
-    done
-    if [[ "$total_count" == 0 ]]; then
-        echo "::warning:: no build on $repo branch $branch, retrigger impossible..."
-    elif [[ "$conclusion" == "null" ]]; then
-        echo "::warning::the build on $repo branch $branch did not finish in time"
-    else
-        conclusion="$(firstFieldFromJson runs.json "conclusion")"
-        echo "::info:: conclusion: $conclusion"
-        if [[ "$conclusion" != failure ]]; then
-            echo "::warning::the latest build on $repo branch $branch did not finish with failure (but $conclusion), retrigger impossible..."
-        else
-            rerunUrl="$(firstFieldFromJson runs.json "rerun_url")"
-            echo "::info::triggering: $rerunUrl"
-            curl -s \
-                -XPOST \
-                -u "automation:$INPUT_TRIGGER_TOKEN"  \
-                "$rerunUrl"
-        fi
-    fi
-}
-firstFieldFromJson() {
-    local  file="$1"; shift
-    local field="$1"; shift
-
-    grep -E "^ *\"$field\": " "$file" \
-        | head -1 \
-        | sed 's/^[^:]*: *//;s/,$//;s/"//g'
-}
-main() {
-    setupTracing
-    handleArgs
-
-    installS3cmd "https://$INPUT_HOST" "$INPUT_ACCESS_KEY" "$INPUT_SECRET_KEY"
+    prepS3cmd "https://$host" "$access_key" "$secret_key"
 
     local loc buc rem
-    loc="$INPUT_LOCAL_DIR/"
-    buc="s3://$INPUT_BUCKET"
-    rem="$(sed 's|^s3:/||;s|//*|/|g;s|/[.]/|/|g;s|^|s3:/|' <<<"$buc/$INPUT_S3_DIR/")"
+    loc="$local_dir/"
+    buc="s3://$bucket"
+    rem="$(sed 's|^s3:/||;s|//*|/|g;s|/[.]/|/|g;s|^|s3:/|' <<<"$buc/$s3_dir/")"
 
-    case "$INPUT_CMD" in
+    case "$cmd" in
     (get)
-        get "$buc" "$rem" "$loc"
+        s3get "$buc" "$rem" "$loc"
         ;;
     (put)
-        put "$buc" "$loc" "$rem"
-        trigger "$rem"
+        s3put "$buc" "$loc" "$rem"
+        if [[ "$s3_dir_branched" != "" && "$trigger_token" != "" ]]; then
+            trigger "$trigger_token" "$rem"
+        fi
         ;;
     (*)
-        echo "::error::'cmd' must be 'put' or 'get' (not '$INPUT_CMD')"
+        echo "::error::'cmd' must be 'put' or 'get' (not '$cmd')"
         exit 99
         ;;
     esac

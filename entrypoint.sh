@@ -14,6 +14,27 @@
 ##     Arjan Kok, Carel Bast                                                                                           ~
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+if [[ "${INPUT_TRACE:-false}" == "true" ]]; then
+    # shellcheck disable=SC2207
+    INPUT_VARS=( $(env | grep '^INPUT_' | sed 's/^INPUT_//;s/=.*//') )
+    for name in "${INPUT_VARS[@]}"; do
+        printf "# %16s = %s\n" "$name" "$(eval "echo \${INPUT_$name:-}")"
+    done
+    set -x
+fi
+
+. "$(dirname "${BASH_SOURCE[0]}")/buildToolsMeme.sh"
+includeBuildTools "$INPUT_TOKEN"
 . "$(dirname "${BASH_SOURCE[0]}")/functions.sh"
 
-main
+main \
+  "$INPUT_ACCESS_KEY" \
+  "$INPUT_SECRET_KEY" \
+  "$INPUT_TRIGGER_TOKEN" \
+  "$INPUT_CMD" \
+  "$INPUT_BUCKET" \
+  "$INPUT_LOCAL_DIR" \
+  "$INPUT_S3_DIR" \
+  "$INPUT_S3_DIR_BRANCHED" \
+  "$INPUT_HOST" \
+  "$INPUT_REGION"
