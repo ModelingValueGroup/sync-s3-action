@@ -46,6 +46,7 @@ main() {
         fi
     fi
 
+java -jar buildTools.jar | nl
     prepS3cmd "https://$host" "$access_key" "$secret_key"
 
     local loc buc rem
