@@ -30,7 +30,7 @@ main() {
 
     if [[ "${host:-}" == "" ]];then
         region="${region:-nl-ams}"
-          host="s3.region.scw.cloud"
+          host="s3.$region.scw.cloud"
     fi
     if [[ "${s3_dir_branched:-}" != "" && "${s3_dir:-}" != "" ]]; then
         echo "::error::only pass one of: s3_dir, s3_dir_branched"
@@ -46,7 +46,7 @@ main() {
         fi
     fi
 
-    prepS3cmd "https://$host" "$access_key" "$secret_key"
+    local conf="$(prepS3cmd "https://$host" "$access_key" "$secret_key")"
 
     local loc buc rem
     loc="$local_dir/"
@@ -55,12 +55,12 @@ main() {
 
     case "$cmd" in
     (get)
-        s3get "$buc" "$rem" "$loc"
+        s3get "$conf" "$buc" "$rem" "$loc"
         ;;
     (put)
-        s3put "$buc" "$loc" "$rem"
+        s3put "$conf" "$buc" "$loc" "$rem"
         if [[ "$s3_dir_branched" != "" && "$trigger_token" != "" ]]; then
-            trigger "$trigger_token" "$rem"
+            s3trigger "$conf" "$trigger_token" "$rem"
         fi
         ;;
     (*)

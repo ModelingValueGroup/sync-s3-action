@@ -62,11 +62,11 @@ jobs:
           #
           . ./functions.sh
           handleArgs
-          installS3cmd "https://$INPUT_HOST" "${{ secrets.SCALEWAY_ACCESS_KEY }}" "${{ secrets.SCALEWAY_SECRET_KEY }}"
+          local conf="$(prepS3cmd "https://$INPUT_HOST" "${{ secrets.SCALEWAY_ACCESS_KEY }}" "${{ secrets.SCALEWAY_SECRET_KEY }}")"
 
-          s3cmd_ rm "s3://${{ env.TEMP_BUCKET }}/s3-dir/test123"
-          s3cmd_ rm "s3://${{ env.TEMP_BUCKET }}/s3-dir"
-          s3cmd_ rb "s3://${{ env.TEMP_BUCKET }}"
+          s3cmd --config="$config" rm "s3://${{ env.TEMP_BUCKET }}/s3-dir/test123"
+          s3cmd --config="$config" rm "s3://${{ env.TEMP_BUCKET }}/s3-dir"
+          s3cmd --config="$config" rb "s3://${{ env.TEMP_BUCKET }}"
 
       - name: "test: check"
         run: |
