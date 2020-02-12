@@ -62,7 +62,7 @@ jobs:
           . buildToolsMeme.sh
           includeBuildTools "${{ secrets.GITHUB_TOKEN }}"
 
-          local conf="$(prepS3cmd "https://s3.nl-ams.scw.cloud" "${{ secrets.SCALEWAY_ACCESS_KEY }}" "${{ secrets.SCALEWAY_SECRET_KEY }}")"
+          conf="$(prepS3cmd "https://s3.nl-ams.scw.cloud" "${{ secrets.SCALEWAY_ACCESS_KEY }}" "${{ secrets.SCALEWAY_SECRET_KEY }}")"
 
           s3cmd --config="$config" rm "s3://${{ env.TEMP_BUCKET }}/s3-dir/test123"
           s3cmd --config="$config" rm "s3://${{ env.TEMP_BUCKET }}/s3-dir"
