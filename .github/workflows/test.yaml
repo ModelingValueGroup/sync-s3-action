@@ -60,8 +60,9 @@ jobs:
       - name: "test: cleanup"
         run: |
           #
-          . ./functions.sh
-          handleArgs
+          . buildToolsMeme.sh
+          includeBuildTools "${{ secrets.GITHUB_TOKEN }}"
+
           local conf="$(prepS3cmd "https://$INPUT_HOST" "${{ secrets.SCALEWAY_ACCESS_KEY }}" "${{ secrets.SCALEWAY_SECRET_KEY }}")"
 
           s3cmd --config="$config" rm "s3://${{ env.TEMP_BUCKET }}/s3-dir/test123"
