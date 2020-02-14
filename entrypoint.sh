@@ -16,7 +16,7 @@
 
 if [[ "${INPUT_TRACE:-false}" == "true" ]]; then
     # shellcheck disable=SC2207
-    INPUT_VARS=( $(env | grep '^INPUT_' | sed 's/^INPUT_//;s/=.*//') )
+    INPUT_VARS=( $(env | grep '^INPUT_' | sed 's/^INPUT_//;s/=.*//' | sort) )
     for name in "${INPUT_VARS[@]}"; do
         printf "# %16s = %s\n" "$name" "$(eval "echo \${INPUT_$name:-}")"
     done

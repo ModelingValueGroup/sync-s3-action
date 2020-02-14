@@ -3,19 +3,21 @@ description: 'get/put files from/to S3'
 author: 'Tom Brus'
 
 inputs:
-  # required ================================================================
+  # tokens ================================================================
   token:
-    description: 'the github token'
+    description: 'the github token (used to access the githhub package registry for buildTools.jar)'
     required: true
-  trigger_token:
-    description: 'the github token to use for retriggering'
+  trigger_token:ª
+    description: 'the github token (used for retriggering other actions)'
     required: true
   access_key:
-    description: 'the AWS or Scaleway ACCESS_KEY'
+    description: 'the AWS or Scaleway ACCESS_KEY (used to access S3)'
     required: true
   secret_key:
-    description: 'the AWS or Scaleway SECRET_KEY'
+    description: 'the AWS or Scaleway SECRET_KEY (used to access S3)'
     required: true
+
+  # required ================================================================
   cmd:
     description: 'the direction of the copy: "put" or "get"'
     required: true
