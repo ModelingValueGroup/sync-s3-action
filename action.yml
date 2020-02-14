@@ -7,7 +7,7 @@ inputs:
   token:
     description: 'the github token (used to access the githhub package registry for buildTools.jar)'
     required: true
-  trigger_token:ª
+  trigger_token:
     description: 'the github token (used for retriggering other actions)'
     required: true
   access_key:
