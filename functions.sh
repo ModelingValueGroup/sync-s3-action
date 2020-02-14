@@ -46,7 +46,7 @@ main() {
         fi
     fi
 
-    local conf="$(prepS3cmd "https://$host" "$access_key" "$secret_key")"
+    local confArg="$(prepS3cmd "https://$host" "$access_key" "$secret_key")"
 
     local loc buc rem
     loc="$local_dir/"
@@ -55,12 +55,12 @@ main() {
 
     case "$cmd" in
     (get)
-        s3get "$conf" "$buc" "$rem" "$loc"
+        s3get "$confArg" "$buc" "$rem" "$loc"
         ;;
     (put)
-        s3put "$conf" "$buc" "$loc" "$rem"
+        s3put "$confArg" "$buc" "$loc" "$rem"
         if [[ "$s3_dir_branched" != "" && "$trigger_token" != "" ]]; then
-            s3trigger "$conf" "$trigger_token" "$rem"
+            s3trigger "$confArg" "$trigger_token" "$rem"
         fi
         ;;
     (*)
