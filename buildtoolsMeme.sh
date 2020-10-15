@@ -20,30 +20,30 @@ includeBuildToolsVersion() {
     local   token="$1"; shift
     local version="$1"; shift
 
-    local url="https://maven.pkg.github.com/ModelingValueGroup/buildTools/org.modelingvalue.buildTools/$version/buildTools-$version.jar"
+    local url="https://maven.pkg.github.com/ModelingValueGroup/buildtools/org.modelingvalue.buildtools/$version/buildtools-$version.jar"
 
-    rm -f ~/buildTools.jar
-    curl -s -H "Authorization: bearer $token" -L "$url" -o ~/buildTools.jar
-    if [[ "$(file ~/buildTools.jar)" =~ .*text.* ]]; then
-        echo "::error::could not download buildTools jar from: $url"
-        sed 's/^/    /' ~/buildTools.jar
+    rm -f ~/buildtools.jar
+    curl -s -H "Authorization: bearer $token" -L "$url" -o ~/buildtools.jar
+    if [[ "$(file ~/buildtools.jar)" =~ .*text.* ]]; then
+        echo "::error::could not download buildtools jar from: $url"
+        sed 's/^/    /' ~/buildtools.jar
         exit 91
     fi
-    . <(java -jar ~/buildTools.jar)
-    echo "INFO: installed buildTools version $version"
+    . <(java -jar ~/buildtools.jar)
+    echo "INFO: installed buildtools version $version"
 }
 includeBuildTools() {
     local   token="$1"; shift
     local version="${1:-}"
 
-    includeBuildToolsVersion "$token" "${version:-2.2.3}"
+    includeBuildToolsVersion "$token" "${version:-3.0.3}"
     if [[ "${version}" == "" ]]; then
-        includeBuildToolsVersion "$token" "$(lastPackageVersion "$token" "ModelingValueGroup/buildTools" "org.modelingvalue" "buildTools")"
+        includeBuildToolsVersion "$token" "$(lastPackageVersion "$token" "ModelingValueGroup/buildtools" "org.modelingvalue" "buildtools")"
     fi
 }
 
 if [[ "${1:-}" == "" ]]; then
-    echo "::error::no token passed to buildToolsMeme.sh"
+    echo "::error::no token passed to buildtoolsMeme.sh"
     exit 56
 fi
 includeBuildTools "$1" "${2:-}"

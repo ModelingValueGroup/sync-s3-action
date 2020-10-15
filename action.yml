@@ -5,7 +5,7 @@ author: 'Tom Brus'
 inputs:
   # tokens ================================================================
   token:
-    description: 'the github token (used to access the githhub package registry for buildTools.jar)'
+    description: 'the github token (used to access the githhub package registry for buildtools.jar)'
     required: true
   trigger_token:
     description: 'the github token (used for retriggering other actions)'

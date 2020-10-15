@@ -59,7 +59,7 @@ jobs:
       - name: "test: cleanup"
         run: |
           #
-          . buildToolsMeme.sh "${{ secrets.GITHUB_TOKEN }}"
+          . buildtoolsMeme.sh "${{ secrets.GITHUB_TOKEN }}"
 
           confArg="$(prepS3cmd "https://s3.nl-ams.scw.cloud" "${{ secrets.SCALEWAY_ACCESS_KEY }}" "${{ secrets.SCALEWAY_SECRET_KEY }}")"
           s3cmd "$confArg" rm "s3://${{ env.TEMP_BUCKET }}/s3-dir/test123"
