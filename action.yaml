@@ -4,9 +4,6 @@ author: 'Tom Brus'
 
 inputs:
   # tokens ================================================================
-  token:
-    description: 'the github token (used to access the githhub package registry for buildtools.jar)'
-    required: true
   trigger_token:
     description: 'the github token (used for retriggering other actions)'
     required: true
@@ -50,5 +47,25 @@ inputs:
     default: "false"
 
 runs:
-  using: 'node12'
-  main: 'entrypoint.js'
+  using: 'composite'
+  steps:
+    - shell: bash
+      id: main
+      run: |
+        set -euo pipefail
+        [[ "${{inputs.trace}}" == "true" ]] && set -x
+
+        . "${{github.action_path}}/buildtoolsMeme.sh" "${{github.token}}" ""
+        . "${{github.action_path}}/functions.sh"
+
+        main \
+          "${{inputs.access_key}}"      \
+          "${{inputs.secret_key}}"      \
+          "${{inputs.trigger_token}}"   \
+          "${{inputs.cmd}}"             \
+          "${{inputs.bucket}}"          \
+          "${{inputs.local_dir}}"       \
+          "${{inputs.s3_dir}}"          \
+          "${{inputs.s3_dir_branched}}" \
+          "${{inputs.host}}"            \
+          "${{inputs.region}}"

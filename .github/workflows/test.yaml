@@ -8,10 +8,30 @@ jobs:
       - name: "checkout"
         uses: actions/checkout@v1
 
+      - name: "attach head"
+        run: git checkout "${GITHUB_REF#refs/heads/}"
+
       - name: "setup JDK"
         uses: actions/setup-java@v1
         with:
           java-version: 11
+
+      - name: "get buildtools"
+        uses: ModelingValueGroup/buildtools@master
+
+      - name: "get generic info" # for header file used below
+        uses: ModelingValueGroup/generic-info@master
+
+      - name: "(re)generate some files"
+        run: |
+          . <(java -jar ~/buildtools.jar)
+          correctEols
+          correctHeaders header
+
+      - name: "push changes back to github"
+        run: |
+          . <(java -jar ~/buildtools.jar)
+          pushBackToGithub "${{secrets.GITHUB_TOKEN}}" "automation@modelingvalue.com" "adjusted files [by github actions]"
 
       - name: "test: prepare"
         run: |
@@ -23,10 +43,9 @@ jobs:
       - name: "test: put with branch dir"
         uses: ModelingValueGroup/sync-s3-action@master
         with:
-          token          : "${{ secrets.GITHUB_TOKEN }}"
-          trigger_token  : "${{ secrets.RETRIGGER_TOKEN }}"
-          access_key     : "${{ secrets.SCALEWAY_ACCESS_KEY }}"
-          secret_key     : "${{ secrets.SCALEWAY_SECRET_KEY }}"
+          trigger_token  : "${{secrets.RETRIGGER_TOKEN}}"
+          access_key     : "${{secrets.SCALEWAY_ACCESS_KEY}}"
+          secret_key     : "${{secrets.SCALEWAY_SECRET_KEY}}"
           bucket         : "mvg-test-perma"
           cmd            : "put"
           local_dir      : "test-dir-put"
@@ -35,11 +54,10 @@ jobs:
       - name: "test: put"
         uses: ModelingValueGroup/sync-s3-action@master
         with:
-          token          : "${{ secrets.GITHUB_TOKEN }}"
-          trigger_token  : "${{ secrets.RETRIGGER_TOKEN }}"
-          access_key     : "${{ secrets.SCALEWAY_ACCESS_KEY }}"
-          secret_key     : "${{ secrets.SCALEWAY_SECRET_KEY }}"
-          bucket         : "${{ env.TEMP_BUCKET }}"
+          trigger_token  : "${{secrets.RETRIGGER_TOKEN}}"
+          access_key     : "${{secrets.SCALEWAY_ACCESS_KEY}}"
+          secret_key     : "${{secrets.SCALEWAY_SECRET_KEY}}"
+          bucket         : "${{env.TEMP_BUCKET}}"
           cmd            : "put"
           local_dir      : "test-dir-put"
           s3_dir         : "s3-dir"
@@ -47,24 +65,21 @@ jobs:
       - name: "test: get"
         uses: ModelingValueGroup/sync-s3-action@master
         with:
-          token          : "${{ secrets.GITHUB_TOKEN }}"
-          trigger_token  : "${{ secrets.RETRIGGER_TOKEN }}"
-          access_key     : "${{ secrets.SCALEWAY_ACCESS_KEY }}"
-          secret_key     : "${{ secrets.SCALEWAY_SECRET_KEY }}"
-          bucket         : "${{ env.TEMP_BUCKET }}"
+          trigger_token  : "${{secrets.RETRIGGER_TOKEN}}"
+          access_key     : "${{secrets.SCALEWAY_ACCESS_KEY}}"
+          secret_key     : "${{secrets.SCALEWAY_SECRET_KEY}}"
+          bucket         : "${{env.TEMP_BUCKET}}"
           cmd            : "get"
           local_dir      : "test-dir-get"
           s3_dir         : "s3-dir"
 
       - name: "test: cleanup"
         run: |
-          #
-          . buildtoolsMeme.sh "${{ secrets.GITHUB_TOKEN }}"
-
-          confArg="$(prepS3cmd "https://s3.nl-ams.scw.cloud" "${{ secrets.SCALEWAY_ACCESS_KEY }}" "${{ secrets.SCALEWAY_SECRET_KEY }}")"
-          s3cmd "$confArg" rm "s3://${{ env.TEMP_BUCKET }}/s3-dir/test123"
-          s3cmd "$confArg" rm "s3://${{ env.TEMP_BUCKET }}/s3-dir"
-          s3cmd "$confArg" rb "s3://${{ env.TEMP_BUCKET }}"
+          . <(java -jar ~/buildtools.jar)
+          confArg="$(prepS3cmd "https://s3.nl-ams.scw.cloud" "${{secrets.SCALEWAY_ACCESS_KEY}}" "${{secrets.SCALEWAY_SECRET_KEY}}")"
+          s3cmd "$confArg" rm "s3://${{env.TEMP_BUCKET}}/s3-dir/test123"
+          s3cmd "$confArg" rm "s3://${{env.TEMP_BUCKET}}/s3-dir"
+          s3cmd "$confArg" rb "s3://${{env.TEMP_BUCKET}}"
 
       - name: "test: check"
         run: |
@@ -72,5 +87,5 @@ jobs:
             echo "::error::failed to get the test file"
             exit 88
           fi
-          echo "# all ok"
+          echo "all ok"
 
