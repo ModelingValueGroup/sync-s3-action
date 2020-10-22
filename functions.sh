@@ -84,6 +84,8 @@ prepare() {
     git config --global user.email "automation@modelingvalue.nl"
     git config --global user.name  "automation"
 
+set |fgrep -i modelingvalue | sed 's/^/@@@ /'
+
     rm -rf "$ARTIFACTS_CLONE"
     mkdir -p "$ARTIFACTS_CLONE"
     (   cd "$ARTIFACTS_CLONE/.."
