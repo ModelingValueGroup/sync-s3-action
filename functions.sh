@@ -83,7 +83,9 @@ prepare() {
 
     rm -rf "$ARTIFACTS_CLONE"
     mkdir -p "$ARTIFACTS_CLONE"
+ls -lRa "$ARTIFACTS_CLONE/.."
     (   cd "$ARTIFACTS_CLONE/.."
+echo "HUH"
         if [[ -d "$ARTIFACTS_REPOS/.git" ]]; then
             echo "### clone already on disk"
         elif git clone "https://$trigger_token@github.com/$GITHUB_ACTOR/$ARTIFACTS_REPOS.git"; then
