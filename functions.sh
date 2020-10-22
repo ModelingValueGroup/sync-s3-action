@@ -16,6 +16,9 @@
 
 set -euo pipefail
 
+export ARTIFACTS_REPOS="tmp-artifacts"
+export ARTIFACTS_CLONE="/tmp/artifacts/$ARTIFACTS_REPOS"
+
 main() {
     local      access_key="$1"; shift
     local      secret_key="$1"; shift
@@ -68,4 +71,106 @@ main() {
         exit 99
         ;;
     esac
+}
+#############################################################################################
+#############################################################################################
+### the new functionality, using github iso S3
+#############################################################################################
+#############################################################################################
+prepare() {
+    local trigger_token="$1"; shift
+    local    bareBranch="$1"; shift
+
+    rm -rf "$ARTIFACTS_CLONE"
+    mkdir -p "$ARTIFACTS_CLONE"
+    (   cd "$ARTIFACTS_CLONE/.."
+        if [[ -d "$ARTIFACTS_REPOS/.git" ]]; then
+            echo "### clone already on disk"
+        elif git clone "https://$trigger_token@github.com/$GITHUB_ACTOR/$ARTIFACTS_REPOS.git"; then
+            echo "### clone made"
+        else
+            echo "### create new repo"
+            (   cd "$ARTIFACTS_CLONE"
+                echo "### create repos $GITHUB_ACTOR/$ARTIFACTS_REPOS"
+                printf "%s\n%s\n" "# ephemeral artifacts repo" "Build assets from branches are stored here. This is an ephemeral repo." > "README.md"
+                git init
+                git add "README.md"
+                git commit -m "first commit"
+                git remote add origin "git@github.com:$GITHUB_ACTOR/$ARTIFACTS_REPOS.git"
+                curl -X POST \
+                        --location \
+                        --remote-header-name \
+                        --fail \
+                        --silent \
+                        --show-error \
+                        --header "Authorization: token $trigger_token" \
+                        -d '{"name":"'"$ARTIFACTS_REPOS"'"}' \
+                        "$GITHUB_API_URL/orgs/$GITHUB_ACTOR/repos" \
+                        -o - \
+                    | jq .
+               git push -u origin master
+
+               git checkout -b _
+               git push -u origin _
+
+               git checkout -b develop
+               git push -u origin develop
+            )
+        fi >> "$ARTIFACTS_CLONE/../log" 2>&1
+
+        if [[ ! -d "$ARTIFACTS_REPOS/.git" ]]; then
+            echo "::error::could not clone or create $GITHUB_ACTOR/$ARTIFACTS_REPOS" 1>&2
+            exit 24
+        fi
+
+        (   cd "$ARTIFACTS_CLONE"
+            echo "### checkout $bareBranch"
+            if ! git checkout "$bareBranch"; then
+                git checkout _
+                git checkout -b "$bareBranch"
+                git push -u origin "$bareBranch"
+            fi
+        ) >> "$ARTIFACTS_CLONE/../log" 2>&1
+    )
+}
+push() {
+    (   cd "$ARTIFACTS_CLONE"
+        echo "### pushing"
+        git add .
+        git commit -a -m "branch assets @$(date +'%Y-%m-%d %H:%M:%S')"
+        git push || echo bla
+    ) >> "$ARTIFACTS_CLONE/../log" 2>&1
+}
+copyAll() {
+    local local_dir="$1"; shift
+    local  subPath="$1"; shift
+
+    mkdir -p "$ARTIFACTS_CLONE/lib/$subPath"
+    cp -r "$local_dir/" "$ARTIFACTS_CLONE/lib/$subPath"
+}
+triggerAll() {
+    local subPath="$1"; shift
+
+    local trigger
+    for trigger in "$ARTIFACTS_CLONE/trigger/$subPath"/*; do
+        if [[ -f "$trigger" ]]; then
+            . "$trigger"
+            echo "TRIGGER $TRIGGER_REPOSITORY -> $TRIGGER_BRANCH" # TODO
+        fi
+    done
+}
+newmain() {
+    local   trigger_token="$1"; shift
+    local       local_dir="$1"; shift
+    local           group="$1"; shift
+    local        artifact="$1"; shift
+    local          branch="$1"; shift
+
+    local      bareBranch="${branch#refs/heads/}"
+    local         subPath="${group//./\/}/$artifact"
+
+    prepare "$trigger_token" "$bareBranch"
+    copyAll "$local_dir" "$subPath"
+    push
+    triggerAll "$subPath"
 }

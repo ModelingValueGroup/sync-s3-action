@@ -29,3 +29,38 @@ To get this file back:
           local_dir : theDirOnDiskForGet
           s3_dir    : theDirInS3
 ```
+
+# Current structure in S3
+
+```
+    aBucket
+        /<group>
+            /<artifact>
+                /<branch-name>
+                    /<asset-1>
+                    /<asset-2>
+                    /triggers
+                        /<github-user>#<github-repo>.trigger
+```
+where ```trigger``` files contain:
+```
+TRIGGER_REPOSITORY='<github-user>/<github-repo>'
+TRIGGER_BRANCH='<branch-name>'
+```
+The presence of one or more trigger files tells the script that publishes a new version of an asset that the actions job 
+at the mentioned repo and branch should be triggered.
+
+### Future structure (on Github)
+```
+    <github-user>/artifacts
+        [branch-name]
+            /trigger
+                /<group>
+                    /<artifact>
+                        /<github-user>#<github-repo>.trigger
+            /lib
+                /<group>
+                    /<artifact>
+                        /<object-1>
+                        /<object-2>
+```
