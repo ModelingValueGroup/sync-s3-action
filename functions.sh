@@ -91,17 +91,17 @@ set |fgrep -i modelingvalue | sed 's/^/@@@ /'
     (   cd "$ARTIFACTS_CLONE/.."
         if [[ -d "$ARTIFACTS_REPOS/.git" ]]; then
             echo "### clone already on disk"
-        elif git clone "https://$trigger_token@github.com/$GITHUB_ACTOR/$ARTIFACTS_REPOS.git"; then
+        elif git clone "https://$trigger_token@github.com/$GITHUB_REPOSITORY_OWNER/$ARTIFACTS_REPOS.git"; then
             echo "### clone made"
         else
             echo "### create new repo"
             (   cd "$ARTIFACTS_CLONE"
-                echo "### create repos $GITHUB_ACTOR/$ARTIFACTS_REPOS"
+                echo "### create repos $GITHUB_REPOSITORY_OWNER/$ARTIFACTS_REPOS"
                 printf "%s\n%s\n" "# ephemeral artifacts repo" "Build assets from branches are stored here. This is an ephemeral repo." > "README.md"
                 git init
                 git add "README.md"
                 git commit -m "first commit"
-                git remote add origin "git@github.com:$GITHUB_ACTOR/$ARTIFACTS_REPOS.git"
+                git remote add origin "git@github.com:$GITHUB_REPOSITORY_OWNER/$ARTIFACTS_REPOS.git"
                 curl -X POST \
                         --location \
                         --remote-header-name \
@@ -110,7 +110,7 @@ set |fgrep -i modelingvalue | sed 's/^/@@@ /'
                         --show-error \
                         --header "Authorization: token $trigger_token" \
                         -d '{"name":"'"$ARTIFACTS_REPOS"'"}' \
-                        "$GITHUB_API_URL/orgs/$GITHUB_ACTOR/repos" \
+                        "$GITHUB_API_URL/orgs/$GITHUB_REPOSITORY_OWNER/repos" \
                         -o - \
                     | jq .
                git push -u origin master
@@ -124,7 +124,7 @@ set |fgrep -i modelingvalue | sed 's/^/@@@ /'
         fi #>> "$ARTIFACTS_CLONE/../log" 2>&1
 
         if [[ ! -d "$ARTIFACTS_REPOS/.git" ]]; then
-            echo "::error::could not clone or create $GITHUB_ACTOR/$ARTIFACTS_REPOS" 1>&2
+            echo "::error::could not clone or create $GITHUB_REPOSITORY_OWNER/$ARTIFACTS_REPOS" 1>&2
             exit 24
         fi
 
@@ -180,9 +180,10 @@ newmain() {
     triggerAll "$subPath"
 }
 
+# for local testing....
 testit() {
     . ~/secrets.sh
-      GITHUB_ACTOR="ModelingValueGroup"
+    GITHUB_REPOSITORY_OWNER="ModelingValueGroup"
     GITHUB_API_URL="https://api.github.com"
 
 
