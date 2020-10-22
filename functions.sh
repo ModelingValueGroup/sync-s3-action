@@ -81,6 +81,9 @@ prepare() {
     local trigger_token="$1"; shift
     local    bareBranch="$1"; shift
 
+    git config --global user.email "automation@modelingvalue.nl"
+    git config --global user.name  "automation"
+
     rm -rf "$ARTIFACTS_CLONE"
     mkdir -p "$ARTIFACTS_CLONE"
     (   cd "$ARTIFACTS_CLONE/.."
