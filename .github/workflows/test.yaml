@@ -36,7 +36,7 @@ jobs:
       - name: "test: prepare"
         run: |
           mkdir test-dir-put
-          echo test123 > test-dir-put/test123
+          echo "test123 $(date)" > test-dir-put/test123
           echo "TEMP_BUCKET=mvg-test-temp-$RANDOM" >> $GITHUB_ENV
           printf 'artifacts=("org.modelingvalue testing123 47.11 jar j--")\n' > project.sh
 

@@ -142,8 +142,9 @@ push() {
     (   cd "$ARTIFACTS_CLONE"
         echo "### pushing"
         git add .
-        git commit -a -m "branch assets @$(date +'%Y-%m-%d %H:%M:%S')"
-        git push || echo bla
+        if git commit -a -m "branch assets @$(date +'%Y-%m-%d %H:%M:%S')"; then
+            git push
+        fi
     ) #>> "$ARTIFACTS_CLONE/../log" 2>&1
 }
 copyAll() {
