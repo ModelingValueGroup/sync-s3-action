@@ -124,7 +124,7 @@ runs:
                 "$g"                          \
                 "$a"                          \
                 "${{inputs._branch}}"
-              sed 's/^/ >>> /' $ARTIFACTS_CLONE/../log
+              sed 's/^/ >>> /' $ARTIFACTS_CLONE/../log || :
             fi
           fi
         fi
