@@ -174,3 +174,36 @@ newmain() {
     push
     triggerAll "$subPath"
 }
+
+testit() {
+    . ~/secrets.sh
+      GITHUB_ACTOR="ModelingValueGroup"
+    GITHUB_API_URL="https://api.github.com"
+
+    testBranch="refs/heads/feature/my-funny-branch-name"
+    testBranch="feature/my-funny-branch-name"
+    testBranch="master"
+    testBranch="develop"
+    testBranch="feature/should-be-based-on-_"
+
+    rm -rf /tmp/artifacts-tmp
+    mkdir /tmp/artifacts-tmp
+    (   cd /tmp/artifacts-tmp
+
+        mkdir upl
+        echo "aap$(date +'%Y-%m-%d %H:%M:%S')" > upl/asset1.txt
+        echo "bla$(date +'%Y-%m-%d %H:%M:%S')" > upl/asset2.txt
+
+        #set -x
+        rm -f "$ARTIFACTS_CLONE/../log"
+        newmain \
+                "$INPUT_TOKEN3" \
+                "upl" \
+                "the.group.name" \
+                "the-artifact-name" \
+                "$testBranch" \
+            || echo "failed: $?"
+
+        sed 's/^/ >>> /' $ARTIFACTS_CLONE/../log
+    )
+}
