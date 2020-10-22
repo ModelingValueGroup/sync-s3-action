@@ -83,9 +83,7 @@ prepare() {
 
     rm -rf "$ARTIFACTS_CLONE"
     mkdir -p "$ARTIFACTS_CLONE"
-ls -lRa "$ARTIFACTS_CLONE/.."
     (   cd "$ARTIFACTS_CLONE/.."
-echo "HUH"
         if [[ -d "$ARTIFACTS_REPOS/.git" ]]; then
             echo "### clone already on disk"
         elif git clone "https://$trigger_token@github.com/$GITHUB_ACTOR/$ARTIFACTS_REPOS.git"; then
@@ -118,7 +116,7 @@ echo "HUH"
                git checkout -b develop
                git push -u origin develop
             )
-        fi >> "$ARTIFACTS_CLONE/../log" 2>&1
+        fi #>> "$ARTIFACTS_CLONE/../log" 2>&1
 
         if [[ ! -d "$ARTIFACTS_REPOS/.git" ]]; then
             echo "::error::could not clone or create $GITHUB_ACTOR/$ARTIFACTS_REPOS" 1>&2
@@ -132,7 +130,7 @@ echo "HUH"
                 git checkout -b "$bareBranch"
                 git push -u origin "$bareBranch"
             fi
-        ) >> "$ARTIFACTS_CLONE/../log" 2>&1
+        ) #>> "$ARTIFACTS_CLONE/../log" 2>&1
     )
 }
 push() {
@@ -141,7 +139,7 @@ push() {
         git add .
         git commit -a -m "branch assets @$(date +'%Y-%m-%d %H:%M:%S')"
         git push || echo bla
-    ) >> "$ARTIFACTS_CLONE/../log" 2>&1
+    ) #>> "$ARTIFACTS_CLONE/../log" 2>&1
 }
 copyAll() {
     local local_dir="$1"; shift
@@ -207,6 +205,6 @@ testit() {
                 "$testBranch" \
             || echo "failed: $?"
 
-        sed 's/^/ >>> /' $ARTIFACTS_CLONE/../log
+        sed 's/^/ >>> /' $ARTIFACTS_CLONE/../log || :
     )
 }
