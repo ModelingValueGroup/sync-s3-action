@@ -118,7 +118,7 @@ runs:
             read -r g a v e flags < <(getFirstArtifactWithFlags)
             if [[ "$g" != "" && "$a" != "" ]]; then
               rm -f "$ARTIFACTS_CLONE/../log"
-              newmain \
+              storeTmpArtifacts \
                 "${{inputs.trigger_token}}"   \
                 "${{inputs.local_dir}}"       \
                 "$g"                          \
