@@ -107,7 +107,7 @@ runs:
         if [[ "${{inputs.cmd}}" == put ]]; then
           if [[ "${{inputs._group}}" != "" && "${{inputs._artifact}}" != "" && "${{inputs._branch}}" != "" ]]; then
             rm -f "$ARTIFACTS_CLONE/../log"
-            newmain \
+            storeTmpArtifacts \
               "${{inputs.trigger_token}}"   \
               "${{inputs.local_dir}}"       \
               "${{inputs._group}}"          \

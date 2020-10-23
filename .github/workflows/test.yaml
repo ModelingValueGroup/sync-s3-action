@@ -4,6 +4,8 @@ on:
 jobs:
   test:
     runs-on: [ubuntu-latest]
+    env:
+      GITHUB_TOKEN: "${{secrets.GITHUB_TOKEN}}"
     steps:
       - name: "checkout"
         uses: actions/checkout@v1
@@ -31,7 +33,7 @@ jobs:
       - name: "push changes back to github"
         run: |
           . <(java -jar ~/buildtools.jar)
-          pushBackToGithub "${{secrets.GITHUB_TOKEN}}" "automation@modelingvalue.com" "adjusted files [by github actions]"
+          pushBackToGithub
 
       - name: "test: prepare"
         run: |
